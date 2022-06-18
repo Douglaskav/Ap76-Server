@@ -1,27 +1,20 @@
 const validator = require("validator"); 
-const EmailValidator = require("./email-validator");
-
-const makeSut = () => {
-  const sut = new EmailValidator();
-  return { sut };
-};
+const isValid = require("./email-validator");
 
 describe("EmailValidator", () => {
-  test("Should return true if the validator returns true", async () => {
-    const { sut } = makeSut();
-    let isValid = await sut.isValid("valid_email@mail.com");
-    expect(isValid).toBe(true);
+  test("Should return true if the validator returns true", () => {
+    let isEmailValid = isValid("valid_email@mail.com");
+    expect(isEmailValid).toBe(true);
   });
 
-  test("Should return false if the validator returns false", async () => {
-    const { sut } = makeSut();
+  test("Should return false if the validator returns false", () => {
     validator.isEmailValid = false;
-    let isValid = await sut.isValid("invalid_email@mail.com");
-    expect(isValid).toBe(false);
+    let isEmailValid = isValid("invalid_email@mail.com");
+    expect(isEmailValid).toBe(false);
   });
 
   test("Should throw if no email is provided", () => {
-    const { sut } = makeSut();
-    expect(sut.isValid).toThrow();
+    let isEmailValid = isValid();
+    expect(isEmailValid.error).toBe(400);
   });
 });
