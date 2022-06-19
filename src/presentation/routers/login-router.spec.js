@@ -7,6 +7,12 @@ class EmailValidatorSpy {
 	}
 }
 
+class tokenGeneratorSpy {
+	generateToken(email, password) {
+		
+	}
+}
+
 const makeSut = () => {
 	const emailValidatorSpy = new EmailValidatorSpy();
 	const sut = new LoginRouter({ emailValidator: emailValidatorSpy });
@@ -37,4 +43,17 @@ describe("LoginRouter", () => {
 		const httpResponse = sut.auth(httpRequest);
 		expect(httpResponse.statusCode).toBe(400);
 	});
+
+test("Should return 500 if no httpRequest is provided", () => {
+	const { sut } = makeSut();
+	const httpResponse = sut.auth();
+	expect(httpResponse.statusCode).toBe(500);
 });
+
+test("Should return 500 if the httpRequest doesn't have a body", () => {
+	const { sut } = makeSut();
+	const httpRequest = {};
+	const httpResponse = sut.auth(httpRequest);
+	expect(httpResponse.statusCode).toBe(500);
+
+});                                                            });
