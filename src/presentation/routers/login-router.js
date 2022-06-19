@@ -12,5 +12,6 @@ module.exports = class LoginRouter {
 
 		if (!this.emailValidator.isValid(email))
 			return HttpResponseErrors.badRequest("email");
+
 	}
 };
