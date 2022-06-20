@@ -1,9 +1,9 @@
 const HttpResponseErrors = require("../helpers/http-response-errors");
-const isValid = require("../helpers/email-validator");
 
 module.exports = class LoginRouter {
-	constructor({ emailValidator }) {
+	constructor({ emailValidator, tokenGenerator }) {
 		this.emailValidator = emailValidator;
+		this.tokenGenerator = tokenGenerator;
 	}
 	auth(httpRequest) {
 		if (!httpRequest || !httpRequest.body)
@@ -15,5 +15,10 @@ module.exports = class LoginRouter {
 
 		if (!this.emailValidator.isValid(email))
 			return HttpResponseErrors.badRequest("email");
+
+		const accessToken = this.tokenGenerator.generateToken(email, password);		
+		if (!accessToken) return HttpResponseErrors.unauthorizedError("email or password incorrect");
+
+		return accessToken;
 	}
 };
