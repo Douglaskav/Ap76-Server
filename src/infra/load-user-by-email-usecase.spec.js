@@ -1,19 +1,30 @@
 const { MongoClient } = require("mongodb");
 
+let client, db;
+
 class LoadUserByEmailRepository {
   constructor(userModel) {
     this.userModel = userModel;
   }
 
   async load(email) {
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userModel.findOne({ email }, {
+      projections: {
+        password: 1
+      }
+    });
     return user;
   }
 }
 
-describe("LoadUserByEmail Repository", () => {
-  let client, db;
+const makeSut = () => {
+  const userModel = db.collection("users");
+  const sut = new LoadUserByEmailRepository(userModel);
 
+  return { userModel, sut };
+};
+
+describe("LoadUserByEmail Repository", () => {
   beforeAll(async () => {
     client = await MongoClient.connect(globalThis.__MONGO_URI__, {
       useNewUrlParser: true,
@@ -28,23 +39,21 @@ describe("LoadUserByEmail Repository", () => {
 
   afterAll(async () => {
     await client.close();
-  })
+  });
 
   test("Should return null if no user is found", async () => {
-    const userModel = db.collection("users");
-    const sut = new LoadUserByEmailRepository(userModel);
+    const { sut } = makeSut();
     const user = await sut.load("invalid_email@mail.com");
     expect(user).toBeNull();
   });
 
   test("Should return an user if user is found", async () => {
-    // essa collection não existe e está sendo criada agora.
-    const userModel = db.collection("users");
-    await userModel.insertOne({
+    const { sut, userModel } = makeSut();
+    const fakeUser = await userModel.insertOne({
       email: "valid_email@mail.com",
+      password: 'any_password'
     });
-    const sut = new LoadUserByEmailRepository(userModel);
     const user = await sut.load("valid_email@mail.com");
-    expect(user.email).toBe("valid_email@mail.com");
+    expect(user._id).toEqual(fakeUser.insertedId);
   });
 });
