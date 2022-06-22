@@ -1,26 +1,28 @@
-const { MongoClient } = require('mongodb')
+const { MongoClient } = require("mongodb");
 
 module.exports = {
-  async connect (uri) {
-    this.uri = uri
+  async connect(uri, dbName) {
+    this.uri = uri;
+    this.dbName = dbName;
+
     this.client = await MongoClient.connect(uri, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
-    })
-    this.db = this.client.db()
+      useUnifiedTopology: true,
+    });
+
+    this.db = this.client.db(dbName);
   },
 
-  async disconnect () {
-    await this.client.close()
-    this.client = null
-    this.db = null
+  async disconnect() {
+    await this.client.close();
+    this.client = null;
+    this.db = null;
   },
 
-  async getCollection (name) {
-    console.log(this.client.isConnected());
+  async getDb() {
     if (!this.client || !this.client.isConnected()) {
-      await this.connect(this.uri)
+      await this.connect(this.uri, this.dbName);
     }
-    return this.db.collection(name)
-  }
-}
+    return this.db;
+  },
+};
