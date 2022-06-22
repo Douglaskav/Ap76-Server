@@ -4,7 +4,6 @@ class TokenGenerator {
 	generateToken(email, password) {
 		if (!email) return HttpResponseErrors.badRequest("Missing param email");
 		if (!password) return HttpResponseErrors.badRequest("Missing param password");
-		
 	}
 }
 

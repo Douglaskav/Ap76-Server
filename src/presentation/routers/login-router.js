@@ -12,11 +12,11 @@ module.exports = class LoginRouter {
 			);
 
 		const { email, password } = httpRequest.body;
-		if (!email) return HttpResponseErrors.badRequest("email");
-		if (!password) return HttpResponseErrors.badRequest("password");
+		if (!email) return HttpResponseErrors.badRequest("Missing param email");
+		if (!password) return HttpResponseErrors.badRequest("Missing param password");
 
 		if (!this.emailValidator.isValid(email))
-			return HttpResponseErrors.badRequest("email");
+			return HttpResponseErrors.badRequest("This is not a valid email");
 
 		const accessToken = this.tokenGenerator.generateToken(email, password);
 		if (!accessToken)
