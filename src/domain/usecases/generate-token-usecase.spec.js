@@ -13,7 +13,7 @@ const makeSut = () => {
 };
 
 describe("Generate Token UseCase", () => {
-	test("Should return an error if an email is not provided", () => {
+	it("Should return an error if an email is not provided", () => {
 		const { sut } = makeSut();
 		const httpResponse = sut.generateToken("", "any_password");
 
@@ -21,7 +21,7 @@ describe("Generate Token UseCase", () => {
 		expect(httpResponse.body).toBe("Missing param email");
 	});
 
-	test("Should return an error if an password is not provided", () => {
+	it("Should return an error if an password is not provided", () => {
 		const { sut } = makeSut();
 		const httpResponse = sut.generateToken("any_email@mail.com", "");
 

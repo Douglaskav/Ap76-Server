@@ -1,51 +1,29 @@
-const MongoHelper = require('../helpers/mongo-helper')
-const httpResponseError = require("../../utils/http-response-errors");
-const LoadUserByEmailRepository = require('./load-user-by-email-repository')
-let userModel
+const { MongoClient } = require("mongodb");
 
-const makeSut = () => {
-  return new LoadUserByEmailRepository()
-}
+describe("insert", () => {
+  let connection;
+  let db;
 
-describe('LoadUserByEmail Repository', () => {
   beforeAll(async () => {
-    await MongoHelper.connect(process.env.MONGO_URL)
-    userModel = await MongoHelper.getDb();
-  })
+    connection = await MongoClient.connect(globalThis.__MONGO_URI__, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
-  beforeEach(async () => {
-    await userModel.deleteMany()
-  })
+    db = await connection.db();
+  });
 
   afterAll(async () => {
-    await MongoHelper.disconnect()
-  })
+    await connection.close();
+  });
 
-  test('Should return null if no user is found', async () => {
-    const sut = makeSut()
-    const user = await sut.load('invalid_email@mail.com')
-    expect(user).toBeNull()
-  })
+  it("should insert a doc into collection", async () => {
+    const users = db.collection("users");
 
-  test('Should return an user if user is found', async () => {
-    const sut = makeSut()
-    const fakeUser = await userModel.insertOne({
-      email: 'valid_email@mail.com',
-      name: 'any_name',
-      age: 50,
-      state: 'any_state',
-      password: 'hashed_password'
-    })
-    const user = await sut.load('valid_email@mail.com')
-    expect(user).toEqual({
-      _id: fakeUser.ops[0]._id,
-      password: fakeUser.ops[0].password
-    })
-  })
+    const mockUser = { _id: "some-user-id", name: "John" };
+    await users.insertOne(mockUser);
 
-  test('Should throw if no email is provided', async () => {
-    const sut = makeSut()
-    const promise = sut.load()
-    expect(promise).rejects.toThrow()
-  })
-})
+    const insertedUser = await users.findOne({ _id: "some-user-id" });
+    expect(insertedUser).toEqual(mockUser);
+  });
+});

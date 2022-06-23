@@ -40,21 +40,21 @@ const makeSut = () => {
 };
 
 describe("LoginRouter", () => {
-	test("Should return 400 if no email is provided", () => {
+	it("Should return 400 if no email is provided", () => {
 		const { sut } = makeSut();
 		const httpRequest = { body: { password: "any_password" } };
 		const httpResponse = sut.auth(httpRequest);
 		expect(httpResponse.statusCode).toBe(400);
 	});
 
-	test("Should return 400 if no password is provided", () => {
+	it("Should return 400 if no password is provided", () => {
 		const { sut } = makeSut();
 		const httpRequest = { body: { email: "any_email@mail.com" } };
 		const httpResponse = sut.auth(httpRequest);
 		expect(httpResponse.statusCode).toBe(400);
 	});
 
-	test("Should return 400 if an invalid email is provided", () => {
+	it("Should return 400 if an invalid email is provided", () => {
 		const { sut, emailValidatorSpy } = makeSut();
 		emailValidatorSpy.isEmailValid = false;
 		const httpRequest = {
@@ -64,20 +64,20 @@ describe("LoginRouter", () => {
 		expect(httpResponse.statusCode).toBe(400);
 	});
 
-	test("Should return 500 if no httpRequest is provided", () => {
+	it("Should return 500 if no httpRequest is provided", () => {
 		const { sut } = makeSut();
 		const httpResponse = sut.auth();
 		expect(httpResponse.statusCode).toBe(500);
 	});
 
-	test("Should return 500 if the httpRequest doesn't have a body", () => {
+	it("Should return 500 if the httpRequest doesn't have a body", () => {
 		const { sut } = makeSut();
 		const httpRequest = {};
 		const httpResponse = sut.auth(httpRequest);
 		expect(httpResponse.statusCode).toBe(500);
 	});
 
-	test("Should call TokenGeneratorSpy with correct params", () => {
+	it("Should call TokenGeneratorSpy with correct params", () => {
 		const { sut, tokenGeneratorSpy } = makeSut();
 		const httpRequest = {
 			body: {
@@ -90,7 +90,7 @@ describe("LoginRouter", () => {
 		expect(tokenGeneratorSpy.email).toBe(httpRequest.body.email);
 	});
 
-	test("Should return 401 if the email or password provided are invalid", () => {
+	it("Should return 401 if the email or password provided are invalid", () => {
 		const { sut } = makeSut();
 		const httpRequest = {
 			body: {
@@ -103,7 +103,7 @@ describe("LoginRouter", () => {
 		expect(httpResponse.statusCode).toBe(401);
 	});
 
-	test("Should return 200 and the accessToken if the credentials are correct", () => {
+	it("Should return 200 and the accessToken if the credentials are correct", () => {
 		const { sut } = makeSut();
 		const httpRequest = {
 			body: {

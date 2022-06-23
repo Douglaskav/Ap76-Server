@@ -1,11 +1,9 @@
-const httpResponseError = require("../../utils/http-response-errors");
 const MongoHelper = require('../helpers/mongo-helper')
+const HttpResponseErrors = require("../../utils/http-response-errors");
 
 module.exports = class LoadUserByEmailRepository {
   async load (email) {
-    if (!email) return httpResponseError.badRequest("Missing email");
-
-    const userModel = await MongoHelper.getDb();
+    const userModel = await MongoHelper.getCollection('users')
     const user = await userModel.findOne({
       email
     }, {
