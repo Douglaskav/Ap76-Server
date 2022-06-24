@@ -1,29 +1,52 @@
-const { MongoClient } = require("mongodb");
+const MongoHelper = require("../helpers/mongo-helper");
+const LoadUserByEmailRepository = require("./load-user-by-email-repository");
+const HttpResponseErrors = require("../../utils/http-response-errors");
+let userModel;
+
+const makeSut = () => {
+  return new LoadUserByEmailRepository();
+}
 
 describe("insert", () => {
-  let connection;
-  let db;
-
   beforeAll(async () => {
-    connection = await MongoClient.connect(globalThis.__MONGO_URI__, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
-    db = await connection.db();
+    await MongoHelper.connect(process.env.MONGO_URL)
+    const db = await MongoHelper.db;
+    userModel = db.collection("users");
   });
 
+  beforeEach(async () => {
+    await userModel.deleteMany();
+  })
+
   afterAll(async () => {
-    await connection.close();
+    await MongoHelper.disconnect();
   });
 
   it("should insert a doc into collection", async () => {
-    const users = db.collection("users");
-
     const mockUser = { _id: "some-user-id", name: "John" };
-    await users.insertOne(mockUser);
+    await userModel.insertOne(mockUser);
 
-    const insertedUser = await users.findOne({ _id: "some-user-id" });
+    const insertedUser = await userModel.findOne({ _id: "some-user-id" });
     expect(insertedUser).toEqual(mockUser);
   });
+
+  it("Should return null if an user is not found", async () => {
+    const sut = makeSut(); 
+    const user = await sut.load("invalid_email@mail.com");
+    expect(user).toBeNull();
+  });
+
+  it("Should return an 400 if an email is not provided", async () => {
+    const sut = makeSut();
+    const user = await sut.load();
+    expect(user.statusCode).toBe(400);
+  });
+
+  it("Should return an user if user is found", async () => {
+    const sut = makeSut();
+    let mockUser = { name: "John Doe", email: "valid_email@mail.com" };
+    const insertedUser = await userModel.insertOne(mockUser);
+    const user = await sut.load("valid_email@mail.com");
+    expect(user._id).toStrictEqual(insertedUser.insertedId);
+  })
 });
