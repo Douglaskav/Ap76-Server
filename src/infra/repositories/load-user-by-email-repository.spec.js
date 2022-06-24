@@ -1,6 +1,5 @@
 const MongoHelper = require("../helpers/mongo-helper");
 const LoadUserByEmailRepository = require("./load-user-by-email-repository");
-const HttpResponseErrors = require("../../utils/http-response-errors");
 let userModel;
 
 const makeSut = () => {
@@ -22,7 +21,7 @@ describe("insert", () => {
     await MongoHelper.disconnect();
   });
 
-  it("should insert a doc into collection", async () => {
+  it("Should insert a doc into collection", async () => {
     const mockUser = { _id: "some-user-id", name: "John" };
     await userModel.insertOne(mockUser);
 
