@@ -1,4 +1,4 @@
-module.exports = class HttpResponse {
+module.exports = class HttpResponseErrors {
   static badRequest(paramMissing) {
     return { body: paramMissing, statusCode: 400 };
   }
