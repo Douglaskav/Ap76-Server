@@ -9,4 +9,12 @@ module.exports = class Encrypter {
     const isValid = await bcrypt.compare(value, hash);
     return isValid;
   }
-}
+
+  async hashSync(password, saltRound) {
+    if (!password || !saltRound) throw new Error();
+
+    let hashedPassword = bcrypt.hashSync(password, saltRound);
+
+    return hashedPassword;
+  }
+};

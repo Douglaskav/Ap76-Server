@@ -12,12 +12,25 @@ const makeLoadUserByEmailRepository = () => {
 	return loadUserByEmailRepositorySpy;
 };
 
+const makeEncrypter = () => {
+	class EncrypterSpy {
+		hashSync(password, saltRound) {
+			return 'any_hash';
+		}
+	}
+
+	const encrypterSpy = new EncrypterSpy();
+	return encrypterSpy;
+}
+
 const makeSut = () => {
 	const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository();
+	const encrypterSpy = makeEncrypter();
 	const sut = new CreateUserUseCase({
 		loadUserByEmailRepository: loadUserByEmailRepositorySpy,
+		encrypter: encrypterSpy
 	});
-	return { sut, loadUserByEmailRepositorySpy };
+	return { sut, loadUserByEmailRepositorySpy, encrypterSpy };
 };
 
 describe("CreateUser UseCase", () => {
