@@ -1,8 +1,9 @@
 const HttpResponseErrors = require("../../utils/http-response-errors");
 
 module.exports = class CreateUserUseCase {
-	constructor({ loadUserByEmailRepository, encrypter } = {}) {
+	constructor({ loadUserByEmailRepository, insertUserRepository, encrypter } = {}) {
 		this.loadUserByEmailRepository = loadUserByEmailRepository;
+		this.insertUserRepository = insertUserRepository;
 		this.encrypter = encrypter;
 	}
 
@@ -16,6 +17,9 @@ module.exports = class CreateUserUseCase {
 		const hashedPassword = await this.encrypter.generateHash(password,	saltRound);
 		if (!hashedPassword) return HttpResponseErrors.internalError("Not was possible encrypted the password");
 
-		return { statusCode: 200 };
+		const newUserId = await this.insertUserRepository.insert({ email, username, hashedPassword });
+		if (!newUserId.insertedId) throw new Error("An insertedId was not returned");
+
+		return { user: newUserId, statusCode: 200 };
 	}
 };

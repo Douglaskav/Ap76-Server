@@ -4,33 +4,25 @@ let userModel;
 
 const makeSut = () => {
   return new LoadUserByEmailRepository();
-}
+};
 
-describe("insert", () => {
+describe("LoadUserByEmailRepository", () => {
   beforeAll(async () => {
-    await MongoHelper.connect(process.env.MONGO_URL)
+    await MongoHelper.connect(process.env.MONGO_URL);
     const db = await MongoHelper.db;
     userModel = db.collection("users");
   });
 
   beforeEach(async () => {
     await userModel.deleteMany();
-  })
+  });
 
   afterAll(async () => {
     await MongoHelper.disconnect();
   });
 
-  it("Should insert a doc into collection", async () => {
-    const mockUser = { _id: "some-user-id", name: "John" };
-    await userModel.insertOne(mockUser);
-
-    const insertedUser = await userModel.findOne({ _id: "some-user-id" });
-    expect(insertedUser).toEqual(mockUser);
-  });
-
   it("Should return null if an user is not found", async () => {
-    const sut = makeSut(); 
+    const sut = makeSut();
     const user = await sut.load("invalid_email@mail.com");
     expect(user).toBeNull();
   });
@@ -47,5 +39,5 @@ describe("insert", () => {
     const insertedUser = await userModel.insertOne(mockUser);
     const user = await sut.load("valid_email@mail.com");
     expect(user._id).toStrictEqual(insertedUser.insertedId);
-  })
+  });
 });
