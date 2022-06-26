@@ -1,12 +1,28 @@
 const CreateUserUseCase = require("./create-user-usecase");
 
+const makeLoadUserByEmailRepository = () => {
+	class LoadUserByEmailRepositorySpy {
+		async load(email) {
+			this.email = email;
+			if (this.user && this.email === this.user.email) return this.user;
+		}
+	}
+
+	const loadUserByEmailRepositorySpy = new LoadUserByEmailRepositorySpy();
+	return loadUserByEmailRepositorySpy;
+};
+
 const makeSut = () => {
-	return new CreateUserUseCase();
+	const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository();
+	const sut = new CreateUserUseCase({
+		loadUserByEmailRepository: loadUserByEmailRepositorySpy,
+	});
+	return { sut, loadUserByEmailRepositorySpy };
 };
 
 describe("CreateUser UseCase", () => {
 	it("Should return an error with statusCode 400 if are missing param", () => {
-		const sut = makeSut();
+		const { sut } = makeSut();
 		const cases = [].concat(
 			{ email: "", username: "test", password: "123" },
 			{ email: "any_email@mail.com", username: "", password: "123" },
@@ -23,8 +39,21 @@ describe("CreateUser UseCase", () => {
 		}
 	});
 
+	it("Should return an 409 error if an user already exists", async () => {
+		const { sut, loadUserByEmailRepositorySpy } = makeSut();
+		const mockUser = {
+			email: "any_email@mail.com",
+			username: "test",
+			password: "123",
+		};
+		loadUserByEmailRepositorySpy.user = { email: 'any_email@mail.com' };
+		const user = await sut.create(mockUser);
+		expect(user.statusCode).toBe(409);
+		expect(user.body).toBe("Already existe an user with this email.");
+	});
+
 	it("Should return 200 if the CreateUserUseCase was called with correct params", async () => {
-		const sut = makeSut();
+		const { sut } = makeSut();
 		const mockUser = {
 			email: "any_email@mail.com",
 			username: "test",

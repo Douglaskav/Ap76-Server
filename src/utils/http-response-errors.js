@@ -10,4 +10,8 @@ module.exports = class HttpResponseErrors {
   static unauthorizedError(error) {
     return { body: error, statusCode: 401 };
   }
+
+  static conflictError(error) {
+    return { body: error, statusCode: 409 };
+  }
 };
