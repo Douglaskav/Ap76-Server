@@ -10,11 +10,10 @@ module.exports = class Encrypter {
     return isValid;
   }
 
-  async hashSync(password, saltRound) {
+  async generateHash(password, saltRound) {
     if (!password || !saltRound) throw new Error();
 
     let hashedPassword = bcrypt.hashSync(password, saltRound);
-
     return hashedPassword;
   }
 };

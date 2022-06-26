@@ -9,12 +9,13 @@ module.exports = class CreateUserUseCase {
 	async create({ email, username, password }) {
 		if (!email || !username || !password) throw new Error("Missing Params");
 
-		const user = await this.loadUserByEmailRepository.load(email);	
+		const user = await this.loadUserByEmailRepository.load(email);
 		if (user) return HttpResponseErrors.conflictError("Already existe an user with this email.");
 
 		let saltRound = 8;
-		const hashedPassword = this.encrypter.hashSync(password, saltRound);
+		const hashedPassword = await this.encrypter.generateHash(password,	saltRound);
+		if (!hashedPassword) return HttpResponseErrors.internalError("Not was possible encrypted the password");
 
-		return { statusCode: 200 }
+		return { statusCode: 200 };
 	}
-}
+};

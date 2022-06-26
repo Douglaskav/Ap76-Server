@@ -14,21 +14,22 @@ const makeLoadUserByEmailRepository = () => {
 
 const makeEncrypter = () => {
 	class EncrypterSpy {
-		hashSync(password, saltRound) {
-			return 'any_hash';
+		async generateHash(password, saltRound) {
+			return this.hashedValue;
 		}
 	}
 
 	const encrypterSpy = new EncrypterSpy();
+	encrypterSpy.hashedValue = "any_hash";
 	return encrypterSpy;
-}
+};
 
 const makeSut = () => {
 	const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository();
 	const encrypterSpy = makeEncrypter();
 	const sut = new CreateUserUseCase({
 		loadUserByEmailRepository: loadUserByEmailRepositorySpy,
-		encrypter: encrypterSpy
+		encrypter: encrypterSpy,
 	});
 	return { sut, loadUserByEmailRepositorySpy, encrypterSpy };
 };
@@ -56,21 +57,35 @@ describe("CreateUser UseCase", () => {
 		const { sut, loadUserByEmailRepositorySpy } = makeSut();
 		const mockUser = {
 			email: "any_email@mail.com",
-			username: "test",
-			password: "123",
+			username: "any_username",
+			password: "any_password",
 		};
-		loadUserByEmailRepositorySpy.user = { email: 'any_email@mail.com' };
+		loadUserByEmailRepositorySpy.user = { email: "any_email@mail.com" };
 		const user = await sut.create(mockUser);
 		expect(user.statusCode).toBe(409);
 		expect(user.body).toBe("Already existe an user with this email.");
+	});
+
+	it("Should ensure that the password was been encrypted", async () => {
+		const { sut, encrypterSpy } = makeSut();
+		const mockUser = {
+			email: "any_email@mail.com",
+			username: "any_username",
+			password: "any_password",
+		};
+
+		encrypterSpy.hashedValue = "";
+		const user = await sut.create(mockUser);
+		expect(user.statusCode).toBe(500);
+		expect(user.body).toBe("Not was possible encrypted the password");
 	});
 
 	it("Should return 200 if the CreateUserUseCase was called with correct params", async () => {
 		const { sut } = makeSut();
 		const mockUser = {
 			email: "any_email@mail.com",
-			username: "test",
-			password: "123",
+			username: "any_username",
+			password: "any_password",
 		};
 		const user = await sut.create(mockUser);
 		expect(user.statusCode).toBe(200);
