@@ -1,12 +1,30 @@
 const SendOTPEmailVerification = require("./send-otp-email-verification");
 
+const makeEncrypter = () => {
+	class EncrypterSpy {
+		async generateHash(otp, SALT_ROUNDS) {
+			return this.hash; 
+		}
+	}
+
+	const encrypterSpy = new EncrypterSpy();
+	encrypterSpy.hash = 999999;
+	return encrypterSpy;
+}
+
+
 const makeSut = () => {
-	return new SendOTPEmailVerification();
+	const encrypterSpy = makeEncrypter();
+	const sut = new SendOTPEmailVerification({encrypter: encrypterSpy});
+	return { sut, encrypterSpy }
 };
+
+const defaultMockUser = { userId: "any_id", email: "any_mail@mail.com" }
+
 
 describe("SendOTPEmailVerification", () => {
 	it("Should throw if the params are not provided correctly", () => {
-		const sut = makeSut();
+		const { sut } = makeSut();
 		const cases = [
 			{ userId: "any_id", email: "" },
 			{ userId: "", email: "any_mail@mail.com" },
@@ -19,9 +37,16 @@ describe("SendOTPEmailVerification", () => {
 		}
 	});
 
+	it("Should throw if was not possible encrypt the OTP Code", () => {
+		const { sut, encrypterSpy } = makeSut();
+		encrypterSpy.hash = null;
+		const promise = sut.sendEmailVerification(defaultMockUser);
+		expect(promise).rejects.toThrow();	
+	})
+
 	it("Should return 200 if occured everything ok", async () => {
-		const sut =  makeSut();
-		const emailSent = await sut.sendEmailVerification({ userId: "any_id", email: "any_mail@mail.com" });
+		const { sut } =  makeSut();
+		const emailSent = await sut.sendEmailVerification(defaultMockUser);
 		expect(emailSent.statusCode).toBe(200);
 	});
 });
