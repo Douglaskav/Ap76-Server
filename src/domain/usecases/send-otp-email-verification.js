@@ -1,5 +1,7 @@
+const HttpResponseErrors = require("../../utils/http-response-errors");
+
 module.exports = class SendOTPEmailVerification {
-	constructor({encrypter, insertOTPRegister, emailManager } = {}) {
+	constructor({ encrypter, insertOTPRegister, emailManager } = {}) {
 		this.encrypter = encrypter;
 		this.insertOTPRegister = insertOTPRegister;
 		this.emailManager = emailManager;
@@ -21,17 +23,16 @@ module.exports = class SendOTPEmailVerification {
 		const hashedOTP = await this.encrypter.generateHash(otp, SALT_ROUNDS);
 		if (!hashedOTP) throw new Error("Error while trying encrypt OTP Code");
 
-//		await this.insertOTPRegister.insert({
-//			userId,
-//			otp: hashedOTP,
-//			createdAt: Date.now(),
-//			expiresIn: Date.now() + 3600000,
-//		});
-//
+		await this.insertOTPRegister.insert({
+			userId,
+			otp: hashedOTP,
+			createdAt: Date.now(),
+			expiresIn: Date.now() + 3600000,
+		});
 
+		let emailSent = await this.emailManager.sendMail(mailOptions);
+		if (!emailSent.messageId)	return HttpResponseErrors.internalError("Not was possible send the email");
 
-//
-//		let emailSent = await transporter.sendMail(mailOptions);
-		return { statusCode: 200 };
+		return { emailSent, statusCode: 200 };
 	}
 };
