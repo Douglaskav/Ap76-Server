@@ -9,7 +9,7 @@ const makeFindOTPRegisterByUserId = () => {
 
 	const findOTPRegisterByUserIdSpy = new FindOTPRegisterByUserIdSpy();
 	findOTPRegisterByUserIdSpy.OTPRegister = [{
-		userId: "any_userId",
+		_id: "any_userId",
 		otp: "hashedOTP",
 		createdAt: Date.now(),
 		expiresIn: Date.now() + 3600000,
@@ -40,15 +40,15 @@ const makeSut = () => {
 	return { sut, findOTPRegisterByUserIdSpy, deleteOTPRegisterByUserIdSpy };
 };
 
-const defaultMockValues = { userId: "any_id", otp: 999999 };
+const defaultMockValues = { _id: "any_id", otp: 999999 };
 
 describe("VerifyOTPCode", () => {
 	it("should throw if userId or otp_code are not provided", () => {
 		const { sut } = makeSut();
 		const cases = [
 			{},
-			{ userId: "", otp: "999999" },
-			{ userId: "any_userId", otp: "" },
+			{ _id: "", otp: "999999" },
+			{ _id: "any_userId", otp: "" },
 		];
 
 		for (const index in cases) {

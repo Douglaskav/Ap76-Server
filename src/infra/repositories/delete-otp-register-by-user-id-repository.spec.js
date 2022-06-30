@@ -37,8 +37,10 @@ describe("DeleteOTPRegisteryByUserId Repository", () => {
       createdAt: Date.now(),
       expiresIn: Date.now() + 3600000,
     };
+
     let newUser = await otpModel.insertOne(mockUser);
     const deletedUser = await sut.deleteMany(newUser.insertedId);
     expect(deletedUser.statusCode).toBe(200);
+    expect(deletedUser.deletedOTPRegister.deletedCount).not.toBe(0);
   });
 });
