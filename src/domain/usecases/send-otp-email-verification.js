@@ -1,14 +1,17 @@
 const HttpResponseErrors = require("../../utils/http-response-errors");
 
 module.exports = class SendOTPEmailVerification {
-	constructor({ encrypter, insertOTPRegister, emailManager } = {}) {
+	constructor({ encrypter, insertOTPRegister, deleteOTPRegister, emailManager } = {}) {
 		this.encrypter = encrypter;
 		this.insertOTPRegister = insertOTPRegister;
+		this.deleteOTPRegister = deleteOTPRegister;
 		this.emailManager = emailManager;
 	}
 
-	async sendEmailVerification({ userId, email }) {
-		if (!userId || !email) throw new Error("Missing params");
+	async sendEmailVerification({ _id, email }) {
+		if (!_id || !email) throw new Error("Missing params");
+
+		await this.deleteOTPRegister.deleteMany(_id);
 
 		const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
 
@@ -24,7 +27,7 @@ module.exports = class SendOTPEmailVerification {
 		if (!hashedOTP) throw new Error("Error while trying encrypt OTP Code");
 
 		await this.insertOTPRegister.insert({
-			userId,
+			_id,
 			otp: hashedOTP,
 			createdAt: Date.now(),
 			expiresIn: Date.now() + 3600000,

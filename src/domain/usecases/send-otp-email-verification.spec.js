@@ -14,7 +14,7 @@ const makeEncrypter = () => {
 
 const makeInsertOTPRegister = () => {
 	class InsertOTPRegisterSpy {
-		async insert({ userId, otp, createdAt, expiresIn }) {
+		async insert({ _id, otp, createdAt, expiresIn }) {
 			return { insertedId: this.insertedId };
 		}
 	}
@@ -22,6 +22,18 @@ const makeInsertOTPRegister = () => {
 	const insertOTPRegisterSpy = new InsertOTPRegisterSpy();
 	insertOTPRegisterSpy.insertedId = "any_id";
 	return insertOTPRegisterSpy;
+};
+
+const makeDeleteOTPRegister = () => {
+	class DeleteOTPRegisterySpy {
+		async deleteMany(_id) {
+			return { deletedCount: this.deletedMany };
+		}
+	}
+
+	const deleteOTPRegisterySpy = new DeleteOTPRegisterySpy();
+	deleteOTPRegisterySpy.deletedMany = 1;
+	return deleteOTPRegisterySpy;
 };
 
 const makeEmailManager = () => {
@@ -44,24 +56,32 @@ const makeEmailManager = () => {
 const makeSut = () => {
 	const encrypterSpy = makeEncrypter();
 	const insertOTPRegisterSpy = makeInsertOTPRegister();
+	const deleteOTPRegisterSpy = makeDeleteOTPRegister();
 	const emailManagerSpy = makeEmailManager();
 	const sut = new SendOTPEmailVerification({
 		encrypter: encrypterSpy,
 		insertOTPRegister: insertOTPRegisterSpy,
+		deleteOTPRegister: deleteOTPRegisterSpy,
 		emailManager: emailManagerSpy,
 	});
-	return { sut, encrypterSpy, insertOTPRegisterSpy, emailManagerSpy };
+	return {
+		sut,
+		encrypterSpy,
+		insertOTPRegisterSpy,
+		deleteOTPRegisterSpy,
+		emailManagerSpy,
+	};
 };
 
-const defaultMockUser = { userId: "any_id", email: "any_mail@mail.com" };
+const defaultMockUser = { _id: "any_id", email: "any_mail@mail.com" };
 
 describe("SendOTPEmailVerification", () => {
 	it("Should throw if the params are not provided correctly", () => {
 		const { sut } = makeSut();
 		const cases = [
-			{ userId: "any_id", email: "" },
-			{ userId: "", email: "any_mail@mail.com" },
-			{ userId: "", email: "" },
+			{ _id: "any_id", email: "" },
+			{ _id: "", email: "any_mail@mail.com" },
+			{ _id: "", email: "" },
 		];
 
 		for (const index in cases) {
