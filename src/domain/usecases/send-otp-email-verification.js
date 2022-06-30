@@ -31,7 +31,10 @@ module.exports = class SendOTPEmailVerification {
 		});
 
 		let emailSent = await this.emailManager.sendMail(mailOptions);
-		if (!emailSent.messageId)	return HttpResponseErrors.internalError("Not was possible send the email");
+		if (!emailSent.messageId)
+			return HttpResponseErrors.internalError(
+				"Not was possible send the email"
+			);
 
 		return { emailSent, statusCode: 200 };
 	}

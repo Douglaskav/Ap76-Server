@@ -30,10 +30,10 @@ describe("InsertOTPRegistery Repository", () => {
   it("Should return 200 if the OTP was inserted with successfully", async () => {
     const sut = makeSut();
     const mockDefaultUser = {
-      userId: "any_id",
+      _id: "any_id",
       otp: 999999,
-      createdAt: "9231",
-      expiresIn: "98231",
+      createdAt: Date.now(),
+      expiresIn: Date.now() + 3600000,
     };
     const insertedOtpRegister = await sut.insert(mockDefaultUser);
     expect(insertedOtpRegister.statusCode).toBe(200);
