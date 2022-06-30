@@ -8,7 +8,12 @@ module.exports = class InsertUserRepository {
 
     const db = await MongoHelper.db;
     const userModel = db.collection("users");
-    const user = await userModel.insertOne({ email, username, hashedPassword });
+    const user = await userModel.insertOne({
+      email,
+      username,
+      hashedPassword,
+      verified: false,
+    });
 
     return user;
   }

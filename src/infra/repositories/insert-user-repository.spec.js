@@ -24,11 +24,19 @@ describe("InsertUser Repository", () => {
   it("Should throw if are missing params", async () => {
     const sut = makeSut();
     const cases = [
-      { username: "", email: "any_mail@mail.com", hashedPassword: "any_password", },
+      {
+        username: "",
+        email: "any_mail@mail.com",
+        hashedPassword: "any_password",
+      },
       { username: "any_username", email: "", hashedPassword: "any_password" },
-      { username: "any_username", email: "any_mail@mail.com", hashedPassword: "", }
+      {
+        username: "any_username",
+        email: "any_mail@mail.com",
+        hashedPassword: "",
+      },
     ];
-    
+
     for (const mock in cases) {
       const promise = sut.insert(cases[mock]);
       expect(promise).rejects.toThrow();
@@ -37,8 +45,12 @@ describe("InsertUser Repository", () => {
 
   it("Should insert an user into users collection", async () => {
     const sut = makeSut();
-    const mockUser = { email: "any_mail@mail.com", username: "any_username", hashedPassword: "any_password" };
+    const mockUser = {
+      email: "any_mail@mail.com",
+      username: "any_username",
+      hashedPassword: "any_password",
+    };
     const insertedUser = await sut.insert(mockUser);
     expect(insertedUser).toHaveProperty("insertedId");
-  })
+  });
 });
