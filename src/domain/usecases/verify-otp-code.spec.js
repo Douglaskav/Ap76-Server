@@ -8,13 +8,15 @@ const makeFindOTPRegisterByUserId = () => {
 	}
 
 	const findOTPRegisterByUserIdSpy = new FindOTPRegisterByUserIdSpy();
-	findOTPRegisterByUserIdSpy.OTPRegister = [{
-		_id: "any_userId",
-		otp: "hashedOTP",
-		createdAt: Date.now(),
-		expiresIn: Date.now() + 3600000,
-		length: 1,
-	}];
+	findOTPRegisterByUserIdSpy.OTPRegister = [
+		{
+			_id: "any_userId",
+			otp: "hashedOTP",
+			createdAt: Date.now(),
+			expiresIn: Date.now() + 3600000,
+			length: 1,
+		},
+	];
 	return findOTPRegisterByUserIdSpy;
 };
 
@@ -30,29 +32,49 @@ const makeDeleteOTPRegisterByUserId = () => {
 	return deleteOTPRegisterByUserId;
 };
 
+const makeInsertVerifyToUser = () => {
+	class InsertVerifyToUserSpy {
+		async verify({ _id, verifyTo }) {
+			return this.isVerify;
+		}
+	}
+
+	const insertVerifyToUserSpy = new InsertVerifyToUserSpy();
+	insertVerifyToUserSpy.isVerify = true;
+	return insertVerifyToUserSpy;
+};
+
 const makeEncrypter = () => {
 	class EncrypterSpy {
 		compare(otp, hashedOTP) {
-			return this.isValid
+			return this.isValid;
 		}
 	}
 
 	const encrypterSpy = new EncrypterSpy();
 	encrypterSpy.isValid = true;
 	return encrypterSpy;
-}
+};
 
 const makeSut = () => {
 	const findOTPRegisterByUserIdSpy = makeFindOTPRegisterByUserId();
 	const deleteOTPRegisterByUserIdSpy = makeDeleteOTPRegisterByUserId();
+	const insertVerifyToUserSpy = makeInsertVerifyToUser();
 	const encrypterSpy = makeEncrypter();
 
 	const sut = new VerifyOTPCode({
 		findOTPRegisterByUserId: findOTPRegisterByUserIdSpy,
 		deleteOTPRegisterByUserId: deleteOTPRegisterByUserIdSpy,
-		encrypter: encrypterSpy
+		insertVerifyToUser: insertVerifyToUserSpy,
+		encrypter: encrypterSpy,
 	});
-	return { sut, findOTPRegisterByUserIdSpy, deleteOTPRegisterByUserIdSpy, encrypterSpy };
+	return {
+		sut,
+		findOTPRegisterByUserIdSpy,
+		deleteOTPRegisterByUserIdSpy,
+		insertVerifyToUserSpy,
+		encrypterSpy,
+	};
 };
 
 const defaultMockValues = { _id: "any_id", otp: 999999 };
@@ -82,19 +104,19 @@ describe("VerifyOTPCode", () => {
 	});
 
 	it("Should return an unauthorizedError if the OTPCode was been expired", async () => {
-		const{ sut, findOTPRegisterByUserIdSpy} = makeSut();
+		const { sut, findOTPRegisterByUserIdSpy } = makeSut();
 		findOTPRegisterByUserIdSpy.OTPRegister[0].expiresIn = Date.now() - 3600000;
 		const codeIsValid = await sut.verifyCode(defaultMockValues);
 		expect(codeIsValid.statusCode).toBe(401);
 		expect(codeIsValid.body).toBe("Code has expired. Please request another");
-	})
+	});
 
 	it("Should return an unauthorizedError if the OTPCode is invalid", async () => {
 		const { sut, encrypterSpy } = makeSut();
 		encrypterSpy.isValid = false;
 		const isValid = await sut.verifyCode(defaultMockValues);
 		expect(isValid.statusCode).toBe(401);
-	})
+	});
 
 	it("Should should return 200 if the code provided is valid", async () => {
 		const { sut } = makeSut();
