@@ -1,11 +1,11 @@
 const HttpResponseErrors = require("../../utils/http-response-errors");
 
 module.exports = class LoginRouter {
-	constructor({ emailValidator, tokenGenerator } = {}) {
+	constructor({ emailValidator, authUseCase } = {}) {
 		this.emailValidator = emailValidator;
-		this.tokenGenerator = tokenGenerator;
+		this.authUseCase = authUseCase;
 	}
-	auth(httpRequest) {
+	async auth(httpRequest) {
 		if (!httpRequest || !httpRequest.body)
 			return HttpResponseErrors.internalError(
 				"A valid httpRequest must be provided"
@@ -18,12 +18,12 @@ module.exports = class LoginRouter {
 		if (!this.emailValidator.isValid(email))
 			return HttpResponseErrors.badRequest("This is not a valid email");
 
-		const accessToken = this.tokenGenerator.generateToken(email, password);
+		const accessToken = await this.authUseCase.auth(email, password);
 		if (!accessToken)
 			return HttpResponseErrors.unauthorizedError(
 				"email or password incorrect"
 			);
 
-		return accessToken;
+		return { accessToken, statusCode: 200 };
 	}
 };

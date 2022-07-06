@@ -1,84 +1,87 @@
 const LoginRouter = require("./login-router");
-const jwt = require("jsonwebtoken");
 
-class EmailValidatorSpy {
-	isValid(email) {
-		this.email = email;
-		return this.isEmailValid;
-	}
-}
+// make the makeEmailValidatorSpy
 
-class TokenGeneratorSpy {
-	generateToken(email, password) {
-		this.email = email;
-		this.password = password;
-
-		if (
-			this.email === "registery_user@mail.com" &&
-			this.password === "any_password"
-		) {
-			let accessToken = jwt.sign({ email, password }, "secret");
-			return { accessToken, statusCode: 200 };
+const makeEmailValidator = () => {
+	class EmailValidatorSpy {
+		isValid(email) {
+			this.email = email;
+			return this.isEmailValid;
 		}
-
-		return null;
 	}
-}
+
+	const emailValidatorSpy = new EmailValidatorSpy();
+	emailValidatorSpy.isEmailValid = true;
+	return emailValidatorSpy;
+};
+
+const makeAuthUseCase = () => {
+	class AuthUseCaseSpy {
+		async auth(email, password) {
+			this.email = email;
+			this.password = password;
+
+			return this.accessToken;
+		}
+	}
+
+	const authUseCaseSpy = new AuthUseCaseSpy();
+	authUseCaseSpy.accessToken = "any_token";
+	return authUseCaseSpy;
+};
 
 const makeSut = () => {
-	const emailValidatorSpy = new EmailValidatorSpy();
-	const tokenGeneratorSpy = new TokenGeneratorSpy();
-
-	emailValidatorSpy.isEmailValid = true;
+	const emailValidatorSpy = makeEmailValidator();
+	const authUseCaseSpy = makeAuthUseCase();
 
 	const sut = new LoginRouter({
 		emailValidator: emailValidatorSpy,
-		tokenGenerator: tokenGeneratorSpy,
+		authUseCase: authUseCaseSpy,
 	});
 
-	return { sut, emailValidatorSpy, tokenGeneratorSpy };
+	return { sut, emailValidatorSpy, authUseCaseSpy };
 };
 
 describe("LoginRouter", () => {
-	it("Should return 400 if no email is provided", () => {
+	it("Should return 400 if no email is provided", async () => {
 		const { sut } = makeSut();
 		const httpRequest = { body: { password: "any_password" } };
-		const httpResponse = sut.auth(httpRequest);
+		const httpResponse = await sut.auth(httpRequest);
 		expect(httpResponse.statusCode).toBe(400);
 	});
 
-	it("Should return 400 if no password is provided", () => {
+	it("Should return 400 if no password is provided", async () => {
 		const { sut } = makeSut();
 		const httpRequest = { body: { email: "any_email@mail.com" } };
-		const httpResponse = sut.auth(httpRequest);
+		const httpResponse = await sut.auth(httpRequest);
 		expect(httpResponse.statusCode).toBe(400);
 	});
 
-	it("Should return 400 if an invalid email is provided", () => {
+	it("Should return 400 if an invalid email is provided", async () => {
 		const { sut, emailValidatorSpy } = makeSut();
 		emailValidatorSpy.isEmailValid = false;
 		const httpRequest = {
 			body: { email: "invalid_mail@mail.com", password: "any_password" },
 		};
-		const httpResponse = sut.auth(httpRequest);
+		const httpResponse = await sut.auth(httpRequest);
 		expect(httpResponse.statusCode).toBe(400);
 	});
 
-	it("Should return 500 if no httpRequest is provided", () => {
+	it("Should return 500 if no httpRequest is provided", async () => {
 		const { sut } = makeSut();
-		const httpResponse = sut.auth();
+		const httpResponse = await sut.auth();
 		expect(httpResponse.statusCode).toBe(500);
 	});
 
-	it("Should return 500 if the httpRequest doesn't have a body", () => {
+	it("Should return 500 if the httpRequest doesn't have a body", async () => {
 		const { sut } = makeSut();
 		const httpRequest = {};
-		const httpResponse = sut.auth(httpRequest);
+		const httpResponse = await sut.auth(httpRequest);
 		expect(httpResponse.statusCode).toBe(500);
 	});
 
-	it("Should call TokenGeneratorSpy with correct params", () => {
-		const { sut, tokenGeneratorSpy } = makeSut();
+	it("Should call AuthUseCaseSpy with correct params", async () => {
+		const { sut, authUseCaseSpy } = makeSut();
 		const httpRequest = {
 			body: {
 				email: "valid_email@mail.com",
@@ -86,24 +89,25 @@ describe("LoginRouter", () => {
 			},
 		};
 
-		sut.auth(httpRequest);
-		expect(tokenGeneratorSpy.email).toBe(httpRequest.body.email);
+		await sut.auth(httpRequest);
+		expect(authUseCaseSpy.email).toBe(httpRequest.body.email);
 	});
 
-	it("Should return 401 if the email or password provided are invalid", () => {
-		const { sut } = makeSut();
+	it("Should return 401 if the email or password provided are incorrect", async () => {
+		const { sut, authUseCaseSpy } = makeSut();
+		authUseCaseSpy.accessToken = null;
 		const httpRequest = {
 			body: {
-				email: "invalid_email@mail.com",
-				password: "any_password",
+				email: "wrong_email@mail.com",
+				password: "wrong_password",
 			},
 		};
 
-		const httpResponse = sut.auth(httpRequest);
+		const httpResponse = await sut.auth(httpRequest);
 		expect(httpResponse.statusCode).toBe(401);
 	});
 
-	it("Should return 200 and the accessToken if the credentials are correct", () => {
+	it("Should return 200 and the accessToken if the credentials are correct", async () => {
 		const { sut } = makeSut();
 		const httpRequest = {
 			body: {
@@ -112,7 +116,7 @@ describe("LoginRouter", () => {
 			},
 		};
 
-		const httpResponse = sut.auth(httpRequest);
+		const httpResponse = await sut.auth(httpRequest);
 		expect(httpResponse.statusCode).toBe(200);
 		expect(httpResponse).toHaveProperty("accessToken");
 	});
