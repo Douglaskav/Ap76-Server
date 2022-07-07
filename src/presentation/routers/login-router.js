@@ -5,6 +5,7 @@ module.exports = class LoginRouter {
 		this.emailValidator = emailValidator;
 		this.authUseCase = authUseCase;
 	}
+
 	async auth(httpRequest) {
 		if (!httpRequest || !httpRequest.body)
 			return HttpResponseErrors.internalError(
@@ -25,5 +26,9 @@ module.exports = class LoginRouter {
 			);
 
 		return { accessToken, statusCode: 200 };
+	}
+
+	async create() {
+		// todo create user router
 	}
 };

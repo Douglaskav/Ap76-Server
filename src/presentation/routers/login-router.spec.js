@@ -1,7 +1,6 @@
 const LoginRouter = require("./login-router");
 
 // make the makeEmailValidatorSpy
-
 const makeEmailValidator = () => {
 	class EmailValidatorSpy {
 		isValid(email) {
