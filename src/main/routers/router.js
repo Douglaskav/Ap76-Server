@@ -1,4 +1,4 @@
-const { adapt } = require("../");
+const { adapt } = require("../adapters/express-router-adapter");
 const routes = require("express").Router();
 
 routes.get("/", (req, res) => {

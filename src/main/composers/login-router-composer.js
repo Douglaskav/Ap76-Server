@@ -1,2 +1,4 @@
-const tokenGenerator = require("../../utils/tokenGenerator"); 
-const emailValidator = require("../../utils/email-validator");
+const TokenGenerator = require("../../utils/tokenGenerator"); 
+const EmailValidator = require("../../utils/email-validator");
+
+
