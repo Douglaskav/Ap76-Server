@@ -5,7 +5,6 @@ module.exports = class LoadUserByEmailRepository {
   async load (email) {
     if (!email) return HttpResponseErrors.badRequest("Missing email param");
 
-    await MongoHelper.connect(process.env.MONGO_URL);
     const db = await MongoHelper.db;
     const userModel = db.collection("users");
     const user = await userModel.findOne({
