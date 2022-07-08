@@ -62,7 +62,7 @@ describe("AuthUseCase", () => {
 		const httpResponse = await sut.auth("", "any_password");
 
 		expect(httpResponse.statusCode).toBe(400);
-		expect(httpResponse.body).toBe("Missing param email");
+		expect(httpResponse.body.error).toBe("Missing param email");
 	});
 
 	it("Should return an error if an password is not provided", async () => {
@@ -70,7 +70,7 @@ describe("AuthUseCase", () => {
 		const httpResponse = await sut.auth("any_email@mail.com", "");
 
 		expect(httpResponse.statusCode).toBe(400);
-		expect(httpResponse.body).toBe("Missing param password");
+		expect(httpResponse.body.error).toBe("Missing param password");
 	});
 
 	it("Should call AuthUseCase with the correct credentials", async () => {

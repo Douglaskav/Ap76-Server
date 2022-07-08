@@ -1,17 +1,17 @@
 module.exports = class HttpResponseErrors {
   static badRequest(paramMissing) {
-    return { body: paramMissing, statusCode: 400 };
+    return { body: { error: paramMissing }, statusCode: 400 };
   }
 
   static internalError(error) {
-    return { body: error, statusCode: 500 };
+    return { body: { error }, statusCode: 500 };
   }
 
   static unauthorizedError(error) {
-    return { body: error, statusCode: 401 };
+    return { body: { error }, statusCode: 401 };
   }
 
   static conflictError(error) {
-    return { body: error, statusCode: 409 };
+    return { body: { error }, statusCode: 409 };
   }
 };

@@ -86,7 +86,7 @@ describe("CreateUser UseCase", () => {
 		loadUserByEmailRepositorySpy.user = { email: "any_email@mail.com" };
 		const user = await sut.create(defaultMockUser);
 		expect(user.statusCode).toBe(409);
-		expect(user.body).toBe("Already existe an user with this email.");
+		expect(user.body.error).toBe("Already existe an user with this email.");
 	});
 
 	it("Should ensure that the password was been encrypted", async () => {
@@ -94,7 +94,7 @@ describe("CreateUser UseCase", () => {
 		encrypterSpy.hashedValue = "";
 		const user = await sut.create(defaultMockUser);
 		expect(user.statusCode).toBe(500);
-		expect(user.body).toBe("Not was possible encrypted the password");
+		expect(user.body.error).toBe("Not was possible encrypted the password");
 	});
 
 	it("Should throw if the InsertUserRepository not return the insertedId", async () => {

@@ -1,4 +1,4 @@
-const LoginRouter = require("./login-router");
+const AuthUserRouter = require("./auth-user-router");
 
 // make the makeEmailValidatorSpy
 const makeEmailValidator = () => {
@@ -33,7 +33,7 @@ const makeSut = () => {
 	const emailValidatorSpy = makeEmailValidator();
 	const authUseCaseSpy = makeAuthUseCase();
 
-	const sut = new LoginRouter({
+	const sut = new AuthUserRouter({
 		emailValidator: emailValidatorSpy,
 		authUseCase: authUseCaseSpy,
 	});
@@ -41,18 +41,18 @@ const makeSut = () => {
 	return { sut, emailValidatorSpy, authUseCaseSpy };
 };
 
-describe("LoginRouter", () => {
+describe("AuthUserRouter", () => {
 	it("Should return 400 if no email is provided", async () => {
 		const { sut } = makeSut();
 		const httpRequest = { body: { password: "any_password" } };
-		const httpResponse = await sut.auth(httpRequest);
+		const httpResponse = await sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(400);
 	});
 
 	it("Should return 400 if no password is provided", async () => {
 		const { sut } = makeSut();
 		const httpRequest = { body: { email: "any_email@mail.com" } };
-		const httpResponse = await sut.auth(httpRequest);
+		const httpResponse = await sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(400);
 	});
 
@@ -62,20 +62,20 @@ describe("LoginRouter", () => {
 		const httpRequest = {
 			body: { email: "invalid_mail@mail.com", password: "any_password" },
 		};
-		const httpResponse = await sut.auth(httpRequest);
+		const httpResponse = await sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(400);
 	});
 
 	it("Should return 500 if no httpRequest is provided", async () => {
 		const { sut } = makeSut();
-		const httpResponse = await sut.auth();
+		const httpResponse = await sut.handle();
 		expect(httpResponse.statusCode).toBe(500);
 	});
 
 	it("Should return 500 if the httpRequest doesn't have a body", async () => {
 		const { sut } = makeSut();
 		const httpRequest = {};
-		const httpResponse = await sut.auth(httpRequest);
+		const httpResponse = await sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(500);
 	});
 
@@ -88,7 +88,7 @@ describe("LoginRouter", () => {
 			},
 		};
 
-		await sut.auth(httpRequest);
+		await sut.handle(httpRequest);
 		expect(authUseCaseSpy.email).toBe(httpRequest.body.email);
 	});
 
@@ -102,7 +102,7 @@ describe("LoginRouter", () => {
 			},
 		};
 
-		const httpResponse = await sut.auth(httpRequest);
+		const httpResponse = await sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(401);
 	});
 
@@ -115,7 +115,7 @@ describe("LoginRouter", () => {
 			},
 		};
 
-		const httpResponse = await sut.auth(httpRequest);
+		const httpResponse = await sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(200);
 		expect(httpResponse).toHaveProperty("accessToken");
 	});

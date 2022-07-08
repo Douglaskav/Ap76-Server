@@ -6,7 +6,7 @@ module.exports = class LoginRouter {
 		this.authUseCase = authUseCase;
 	}
 
-	async auth(httpRequest) {
+	async handle(httpRequest) {
 		if (!httpRequest || !httpRequest.body)
 			return HttpResponseErrors.internalError(
 				"A valid httpRequest must be provided"
@@ -16,7 +16,8 @@ module.exports = class LoginRouter {
 		if (!email) return HttpResponseErrors.badRequest("Missing param email");
 		if (!password) return HttpResponseErrors.badRequest("Missing param password");
 
-		if (!this.emailValidator.isValid(email))
+		const isEmailValid = !await this.emailValidator.isValid(email)
+		if (isEmailValid)
 			return HttpResponseErrors.badRequest("This is not a valid email");
 
 		const accessToken = await this.authUseCase.auth(email, password);

@@ -108,7 +108,7 @@ describe("VerifyOTPCode", () => {
 		findOTPRegisterByUserIdSpy.OTPRegister[0].expiresIn = Date.now() - 3600000;
 		const codeIsValid = await sut.verifyCode(defaultMockValues);
 		expect(codeIsValid.statusCode).toBe(401);
-		expect(codeIsValid.body).toBe("Code has expired. Please request another");
+		expect(codeIsValid.body.error).toBe("Code has expired. Please request another");
 	});
 
 	it("Should return an unauthorizedError if the OTPCode is invalid", async () => {
