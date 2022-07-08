@@ -117,6 +117,6 @@ describe("AuthUserRouter", () => {
 
 		const httpResponse = await sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(200);
-		expect(httpResponse).toHaveProperty("accessToken");
+		expect(httpResponse.body).toHaveProperty("accessToken");
 	});
 });

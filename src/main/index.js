@@ -1,12 +1,5 @@
-require("dotenv").config();
-const express = require("express");
-const { routes } = require("./routers/router.js");
+const app = require("./app");
 const MongoHelper = require("../infra/helpers/mongo-helper");
-const app = express();
-
-app.set("PORT", process.env.PORT || 3333);
-app.use(express.json());
-app.use(routes);
 
 MongoHelper.connect(process.env.MONGO_URL).then(() => {
   app.listen(app.get("PORT"), () =>

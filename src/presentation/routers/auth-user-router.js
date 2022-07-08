@@ -14,9 +14,10 @@ module.exports = class LoginRouter {
 
 		const { email, password } = httpRequest.body;
 		if (!email) return HttpResponseErrors.badRequest("Missing param email");
-		if (!password) return HttpResponseErrors.badRequest("Missing param password");
+		if (!password)
+			return HttpResponseErrors.badRequest("Missing param password");
 
-		const isEmailValid = !await this.emailValidator.isValid(email)
+		const isEmailValid = !(await this.emailValidator.isValid(email));
 		if (isEmailValid)
 			return HttpResponseErrors.badRequest("This is not a valid email");
 
@@ -26,6 +27,6 @@ module.exports = class LoginRouter {
 				"email or password incorrect"
 			);
 
-		return { accessToken, statusCode: 200 };
+		return { body: { email, accessToken }, statusCode: 200 };
 	}
 };

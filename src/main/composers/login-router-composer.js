@@ -2,7 +2,7 @@ const TokenGenerator = require("../../utils/tokenGenerator");
 const EmailValidator = require("../../utils/email-validator");
 const Encrypter = require("../../utils/encrypter");
 const AuthUseCase = require("../../domain/usecases/auth-usecase");
-const LoginRouter = require("../../presentation/routers/login-router");
+const AuthUserRouter = require("../../presentation/routers/auth-user-router");
 const LoadUserByEmailRepository = require("../../infra/repositories/load-user-by-email-repository");
 
 module.exports = class LoginRouterComposer {
@@ -14,7 +14,7 @@ module.exports = class LoginRouterComposer {
     const loadUserByEmailRepository = new LoadUserByEmailRepository();
 
     const authUseCase = new AuthUseCase({ loadUserByEmailRepository, tokenGenerator, encrypter });
-    const loginRouter = new LoginRouter({ authUseCase, emailValidator });    
-    return loginRouter;
+    const authUserRouter = new AuthUserRouter({ authUseCase, emailValidator });    
+    return authUserRouter;
   }
 }
