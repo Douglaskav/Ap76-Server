@@ -1,8 +1,6 @@
 const { MongoClient } = require('mongodb');
 
 module.exports = {
-	db: {},
-
 	async connect(uri) {
 		this.uri = uri;
 		this.client = await MongoClient.connect(uri, {

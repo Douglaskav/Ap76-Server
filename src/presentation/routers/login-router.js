@@ -27,8 +27,4 @@ module.exports = class LoginRouter {
 
 		return { accessToken, statusCode: 200 };
 	}
-
-	async create() {
-		// todo create user router
-	}
 };
