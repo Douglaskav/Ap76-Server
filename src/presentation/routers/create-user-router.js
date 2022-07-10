@@ -1,10 +1,14 @@
 const HttpResponseErrors = require("../../utils/http-response-errors");
 
 module.exports = class LoginRouter {
-	constructor({ emailValidator, createUserUseCase, sendOTPEmailVerification } = {}) {
+	constructor({
+		emailValidator,
+		createUserUseCase,
+		sendOTPEmailVerification,
+	} = {}) {
 		this.emailValidator = emailValidator;
 		this.createUserUseCase = createUserUseCase;
-		this.sendOTPEmailVerification = sendOTPEmailVerification;	
+		this.sendOTPEmailVerification = sendOTPEmailVerification;
 	}
 
 	async handle(httpRequest) {
@@ -14,19 +18,31 @@ module.exports = class LoginRouter {
 			);
 
 		const { username, email, password } = httpRequest.body;
-		if (!username) return HttpResponseErrors.badRequest("Missing param username");
-		if (!email) return HttpResponseErrors.badRequest("Missing param email");
-		if (!password) return HttpResponseErrors.badRequest("Missing param password");
 
 		const isEmailValid = !(await this.emailValidator.isValid(email));
-		if (isEmailValid)
-			return HttpResponseErrors.badRequest("This is not a valid email");
-		
+		if (isEmailValid) return HttpResponseErrors.badRequest("This is not a valid email");
 
-		const newUser = await this.createUserUseCase.create({ email, username, password });
-		console.log(newUser);
-		if (!newUser) return HttpResponseErrors.internalError("Not was possible to create the user");
+		if (!username || !email || !password) return HttpResponseErrors.badRequest("Missing param");
 
-		return { body: { email }, statusCode: 200 };
+
+		const newUser = await this.createUserUseCase.create({
+			email,
+			username,
+			password,
+		});
+		if (!newUser)
+			return HttpResponseErrors.internalError(
+				"Not was possible to create the user"
+			);
+
+		const sentEmail = await this.sendOTPEmailVerification.sendEmailVerification(
+			{ _id: newUser._id, email }
+		);
+		if (!sentEmail)
+			return HttpResponseErrors.internalError(
+				"An error occured while the email was sending"
+			);
+
+		return { body: { email, sentEmail }, statusCode: 200 };
 	}
 };

@@ -23,6 +23,7 @@ const makeCreateUserUseCase = () => {
 
 	const createUserUseCase = new CreateUserUseCaseSpy();
 	createUserUseCase.user = {
+		_id: "any_userId",
 		username: "any_username",
 		email: "any_email",
 		password: "any_password",
@@ -30,40 +31,66 @@ const makeCreateUserUseCase = () => {
 	return createUserUseCase;
 };
 
+const makeSendOTPEmailVerification = () => {
+	class SendOTPEmailVerificationSpy {
+		async sendEmailVerification({ _id, email }) {
+			if (!this.messageId) return null;
+
+			return {
+				email: "accepted",
+				messageId: this.messageId,
+				rejected: [],
+			};
+		}
+	}
+
+	const sendOTPEmailVerification = new SendOTPEmailVerificationSpy();
+	sendOTPEmailVerification.messageId =
+		"<b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>";
+	return sendOTPEmailVerification;
+};
+
 const makeSut = () => {
 	const emailValidatorSpy = makeEmailValidator();
 	const createUserUseCaseSpy = makeCreateUserUseCase();
+	const sendOTPEmailVerificationSpy = makeSendOTPEmailVerification();
 
 	const sut = new CreateUserRouter({
 		emailValidator: emailValidatorSpy,
 		createUserUseCase: createUserUseCaseSpy,
+		sendOTPEmailVerification: sendOTPEmailVerificationSpy,
 	});
 
-	return { sut, emailValidatorSpy, createUserUseCaseSpy };
+	return {
+		sut,
+		emailValidatorSpy,
+		createUserUseCaseSpy,
+		sendOTPEmailVerificationSpy,
+	};
+};
+
+const defaultMockHttpRequest = {
+	body: {
+		username: "any_username",
+		email: "any_email",
+		password: "any_password",
+	},
 };
 
 describe("CreateUserRouter", () => {
-	it("Should return 400 if no email is provided", async () => {
+	it("Should return 400 if the params are not provided correctly", async () => {
 		const { sut } = makeSut();
-		const httpRequest = { body: { password: "any_password" } };
-		const httpResponse = await sut.handle(httpRequest);
-		expect(httpResponse.statusCode).toBe(400);
-	});
+		const cases = [
+			{ body: { password: "any_password", username: "any_username" } },
+			{ body: { email: "any_email", username: "any_username" } },
+			{ body: { email: "any_email", password: "any_password" } },
+		];
 
-	it("Should return 400 if no password is provided", async () => {
-		const { sut } = makeSut();
-		const httpRequest = { body: { email: "any_email@mail.com" } };
-		const httpResponse = await sut.handle(httpRequest);
-		expect(httpResponse.statusCode).toBe(400);
-	});
-
-	it("Should return 400 if no username is provided", async () => {
-		const { sut } = makeSut();
-		const httpRequest = {
-			body: { email: "any_email@mail.com", password: "any_password" },
-		};
-		const httpResponse = await sut.handle(httpRequest);
-		expect(httpResponse.statusCode).toBe(400);
+		for (const index in cases) {
+			const httpResponse = await sut.handle(cases[index]);
+			expect(httpResponse.statusCode).toBe(400);
+			expect(httpResponse.body.error).toBe("Missing param");
+		}
 	});
 
 	it("Should return 400 if an invalid email is provided", async () => {
@@ -89,21 +116,24 @@ describe("CreateUserRouter", () => {
 		expect(httpResponse.statusCode).toBe(500);
 	});
 
-	it.todo(
-		"should throw if createUserUseCase.create() is called with invalid params."
-	);
-
 	it("Should throw if not was possible to create a new user", async () => {
 		const { sut, createUserUseCaseSpy } = makeSut();
 		createUserUseCaseSpy.user = null;
-		const httpRequest = {
-			body: {
-				username: "any_username",
-				email: "any_email",
-				password: "any_password",
-			},
-		};
-		const httpResponse = await sut.handle(httpRequest);
+		const httpResponse = await sut.handle(defaultMockHttpRequest);
 		expect(httpResponse.statusCode).toBe(500);
+	});
+
+	it("Should throw if not was possible to send the email", async () => {
+		const { sut, sendOTPEmailVerificationSpy } = makeSut();
+		sendOTPEmailVerificationSpy.messageId = null;
+		const httpResponse = await sut.handle(defaultMockHttpRequest);
+		expect(httpResponse.statusCode).toBe(500);
+	});
+
+	it("Should return 200 if the user was been created without errors", async () => {
+		const { sut } = makeSut();
+		const httpResponse = await sut.handle(defaultMockHttpRequest);
+		expect(httpResponse.statusCode).toBe(200);
+		expect(httpResponse.body.sentEmail).toHaveProperty("messageId")
 	});
 });
