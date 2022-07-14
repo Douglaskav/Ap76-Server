@@ -9,10 +9,6 @@ module.exports = class LoadUserByEmailRepository {
     const userModel = db.collection("users");
     const user = await userModel.findOne({
       email
-    }, {
-      projection: {
-        password: 1
-      }
     })
     return user
   }

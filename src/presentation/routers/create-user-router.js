@@ -24,25 +24,25 @@ module.exports = class LoginRouter {
 
 		if (!username || !email || !password) return HttpResponseErrors.badRequest("Missing param");
 
-
 		const newUser = await this.createUserUseCase.create({
 			email,
 			username,
 			password,
 		});
-		if (!newUser)
+
+		if (!newUser.insertedId)
 			return HttpResponseErrors.internalError(
 				"Not was possible to create the user"
 			);
 
-		const sentEmail = await this.sendOTPEmailVerification.sendEmailVerification(
-			{ _id: newUser._id, email }
+		const emailSent = await this.sendOTPEmailVerification.sendEmailVerification(
+			{ _id: newUser.insertedId, email }
 		);
-		if (!sentEmail)
+		if (!emailSent || !emailSent.sentEmail)
 			return HttpResponseErrors.internalError(
 				"An error occured while the email was sending"
 			);
 
-		return { body: { email, sentEmail }, statusCode: 200 };
+		return { body: { email, sentEmail: emailSent.sentEmail }, statusCode: 200 };
 	}
 };

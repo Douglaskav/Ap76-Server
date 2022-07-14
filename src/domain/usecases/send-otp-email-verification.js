@@ -11,7 +11,7 @@ module.exports = class SendOTPEmailVerification {
 	async sendEmailVerification({ _id, email }) {
 		if (!_id || !email) throw new Error("Missing params");
 
-		await this.deleteOTPRegister.deleteMany(_id);
+		// await this.deleteOTPRegister.deleteMany(_id);
 
 		const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
 
@@ -33,12 +33,12 @@ module.exports = class SendOTPEmailVerification {
 			expiresIn: Date.now() + 3600000,
 		});
 
-		let emailSent = await this.emailManager.sendMail(mailOptions);
-		if (!emailSent.messageId)
+		let { sentEmail } = await this.emailManager.sendMail(mailOptions);
+		if (!sentEmail || !sentEmail.messageId)
 			return HttpResponseErrors.internalError(
 				"Not was possible send the email"
 			);
 
-		return { emailSent, statusCode: 200 };
+		return { sentEmail, statusCode: 200 };
 	}
 };

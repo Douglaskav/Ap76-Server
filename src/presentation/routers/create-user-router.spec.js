@@ -17,17 +17,12 @@ const makeEmailValidator = () => {
 const makeCreateUserUseCase = () => {
 	class CreateUserUseCaseSpy {
 		async create() {
-			return this.user;
+			return { insertedId: this.insertedId };
 		}
 	}
 
 	const createUserUseCase = new CreateUserUseCaseSpy();
-	createUserUseCase.user = {
-		_id: "any_userId",
-		username: "any_username",
-		email: "any_email",
-		password: "any_password",
-	};
+	createUserUseCase.insertedId = "any_id";
 	return createUserUseCase;
 };
 
@@ -37,9 +32,11 @@ const makeSendOTPEmailVerification = () => {
 			if (!this.messageId) return null;
 
 			return {
-				email: "accepted",
-				messageId: this.messageId,
-				rejected: [],
+				sentEmail: {
+					email: "accepted",
+					messageId: this.messageId,
+					rejected: [],
+				},
 			};
 		}
 	}
@@ -118,7 +115,7 @@ describe("CreateUserRouter", () => {
 
 	it("Should throw if not was possible to create a new user", async () => {
 		const { sut, createUserUseCaseSpy } = makeSut();
-		createUserUseCaseSpy.user = null;
+		createUserUseCaseSpy.insertedId = null;
 		const httpResponse = await sut.handle(defaultMockHttpRequest);
 		expect(httpResponse.statusCode).toBe(500);
 	});
@@ -134,6 +131,6 @@ describe("CreateUserRouter", () => {
 		const { sut } = makeSut();
 		const httpResponse = await sut.handle(defaultMockHttpRequest);
 		expect(httpResponse.statusCode).toBe(200);
-		expect(httpResponse.body.sentEmail).toHaveProperty("messageId")
+		expect(httpResponse.body.sentEmail).toHaveProperty("messageId");
 	});
 });

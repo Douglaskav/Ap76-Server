@@ -13,7 +13,7 @@ module.exports = class AuthUseCase {
 			return HttpResponseErrors.badRequest("Missing param password");
 
 		const user = await this.loadUserByEmailRepository.load(email);
-		const isValid = user && await this.encrypter.compare(password, user.password);
+		const isValid = user && await this.encrypter.compare(password, user.hashedPassword);
 		if (isValid) {
 			const accessToken = await this.tokenGenerator.generate(user._id);
 			return accessToken;
