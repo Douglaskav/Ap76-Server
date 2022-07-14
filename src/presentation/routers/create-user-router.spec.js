@@ -131,6 +131,6 @@ describe("CreateUserRouter", () => {
 		const { sut } = makeSut();
 		const httpResponse = await sut.handle(defaultMockHttpRequest);
 		expect(httpResponse.statusCode).toBe(200);
-		expect(httpResponse.body.sentEmail).toHaveProperty("messageId");
+		expect(httpResponse.body).toHaveProperty("messageId");
 	});
 });

@@ -18,7 +18,18 @@ describe("#Routes suite case", () => {
     await MongoHelper.disconnect();
   });
 
-  it("Should return 200 when credentials are valid", async () => {
+  it("Should test if /use/create is working", async () => {
+    await request(app)
+      .post("/user/create")
+      .send({
+        username: "any_username",
+        email: "any_valid_email@mail.com",
+        password: "any_password_to_hash",
+      })
+      .expect(200);
+  });
+
+  it("Should test if /user/login it's ok", async () => {
     await request(app).post("/user/create").send({
       username: "any_username",
       email: "any_valid_email@mail.com",

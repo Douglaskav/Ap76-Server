@@ -23,12 +23,6 @@ describe("DeleteOTPRegisteryByUserId Repository", () => {
     expect(promise).rejects.toThrow();
   });
 
-  it("Should throw if not was possible delete the OTPRegister", async () => {
-    const sut = new DeleteOTPRegisteryByUserId();
-    const promise = sut.deleteMany({ _id: "invalid_user_id" });
-    expect(promise).rejects.toThrow("Not was possible delete the OTPRegister");
-  });
-
   it("Should delete a OTPRegister if are provided correct values", async () => {
     const sut = new DeleteOTPRegisteryByUserId();
     const mockUser = {

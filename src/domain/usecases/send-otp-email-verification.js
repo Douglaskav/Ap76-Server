@@ -11,7 +11,7 @@ module.exports = class SendOTPEmailVerification {
 	async sendEmailVerification({ _id, email }) {
 		if (!_id || !email) throw new Error("Missing params");
 
-		// await this.deleteOTPRegister.deleteMany(_id);
+		await this.deleteOTPRegister.deleteMany(_id);
 
 		const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
 

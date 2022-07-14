@@ -43,6 +43,8 @@ module.exports = class LoginRouter {
 				"An error occured while the email was sending"
 			);
 
-		return { body: { email, sentEmail: emailSent.sentEmail }, statusCode: 200 };
+		const { messageId, envelope } = emailSent.sentEmail;
+
+		return { body: { email, messageId, envelope }, statusCode: 200 };
 	}
 };
