@@ -1,6 +1,5 @@
 const app = require("../app");
 const request = require("supertest");
-const bcrypt = require("bcrypt");
 const MongoHelper = require("../../infra/helpers/mongo-helper");
 let userModel;
 
@@ -20,10 +19,12 @@ describe("#Routes suite case", () => {
   });
 
   it("Should return 200 when credentials are valid", async () => {
-    await userModel.insertOne({
+    await request(app).post("/user/create").send({
+      username: "any_username",
       email: "any_valid_email@mail.com",
-      password: bcrypt.hashSync("any_password_to_hash", 8),
+      password: "any_password_to_hash",
     });
+
     await request(app)
       .post("/user/login")
       .send({

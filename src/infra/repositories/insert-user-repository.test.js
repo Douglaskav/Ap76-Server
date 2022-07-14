@@ -27,13 +27,13 @@ describe("InsertUser Repository", () => {
       {
         username: "",
         email: "any_mail@mail.com",
-        hashedPassword: "any_password",
+        password: "any_password",
       },
-      { username: "any_username", email: "", hashedPassword: "any_password" },
+      { username: "any_username", email: "", password: "any_password" },
       {
         username: "any_username",
         email: "any_mail@mail.com",
-        hashedPassword: "",
+        password: "",
       },
     ];
 
@@ -48,7 +48,7 @@ describe("InsertUser Repository", () => {
     const mockUser = {
       email: "any_mail@mail.com",
       username: "any_username",
-      hashedPassword: "any_password",
+      password: "any_password",
     };
     const insertedUser = await sut.insert(mockUser);
     expect(insertedUser).toHaveProperty("insertedId");

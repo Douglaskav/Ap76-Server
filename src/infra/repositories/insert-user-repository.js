@@ -1,8 +1,8 @@
 const MongoHelper = require("../helpers/mongo-helper");
 
 module.exports = class InsertUserRepository {
-  async insert({ email, username, hashedPassword }) {
-    if (!email || !username || !hashedPassword) {
+  async insert({ email, username, password }) {
+    if (!email || !username || !password) {
       throw new Error("Missing params");
     }
 
@@ -11,7 +11,7 @@ module.exports = class InsertUserRepository {
     const user = await userModel.insertOne({
       email,
       username,
-      hashedPassword,
+      password,
       verified: false,
     });
 

@@ -33,7 +33,7 @@ module.exports = class CreateUserUseCase {
 		const newUser = await this.insertUserRepository.insert({
 			email,
 			username,
-			hashedPassword,
+			password: hashedPassword,
 			verified: false,
 		});
 		if (!newUser.insertedId) throw new Error("An insertedId was not returned");
