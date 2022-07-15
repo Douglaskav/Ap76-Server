@@ -5,5 +5,6 @@ const routes = require("express").Router();
 
 routes.post("/user/login", adapt(AuthUserRouterComposer.compose()));
 routes.post("/user/create", adapt(CreateUserRouterComposer.compose()));
+routes.post("/user/verify", adapt(CreateUserRouterComposer.compose()));
 
 module.exports = { routes };

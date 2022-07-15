@@ -31,14 +31,11 @@ module.exports = class VerifyOTPCode {
 		}
 
 		const isValidOTP = await this.encrypter.compare(otp, hashedOTP);
-		if (!isValidOTP)
-			return HttpResponseErrors.unauthorizedError(
-				"Invalid code passed; Check your email"
-			);
+		if (!isValidOTP) return HttpResponseErrors.unauthorizedError("Invalid code passed; Check your email");
 
 		await this.insertVerifyToUser.verify({ _id, verifyTo: true });
 		await this.deleteOTPRegisterByUserId.deleteMany({ _id });
 
-		return { isValid: true, hashedOTP, statusCode: 200 };
+		return { isValidOTP, statusCode: 200 };
 	}
 };

@@ -26,14 +26,15 @@ describe("DeleteOTPRegisteryByUserId Repository", () => {
   it("Should delete a OTPRegister if are provided correct values", async () => {
     const sut = new DeleteOTPRegisteryByUserId();
     const mockUser = {
-      _id: "valid_user_id",
+      userId: "valid_user_id",
       otp: 999999,
       createdAt: Date.now(),
       expiresIn: Date.now() + 3600000,
     };
 
     let newUser = await otpModel.insertOne(mockUser);
-    const deletedUser = await sut.deleteMany(newUser.insertedId);
+    
+    const deletedUser = await sut.deleteMany(mockUser.userId)
     expect(deletedUser.statusCode).toBe(200);
     expect(deletedUser.deletedOTPRegister.deletedCount).not.toBe(0);
   });

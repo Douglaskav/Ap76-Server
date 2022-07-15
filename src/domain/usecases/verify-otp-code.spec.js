@@ -34,7 +34,7 @@ const makeDeleteOTPRegisterByUserId = () => {
 
 const makeInsertVerifyToUser = () => {
 	class InsertVerifyToUserSpy {
-		async verify({ _id, verifyTo }) {
+		async verify() {
 			return this.isVerify;
 		}
 	}
@@ -46,7 +46,7 @@ const makeInsertVerifyToUser = () => {
 
 const makeEncrypter = () => {
 	class EncrypterSpy {
-		compare(otp, hashedOTP) {
+		compare() {
 			return this.isValid;
 		}
 	}
@@ -121,7 +121,7 @@ describe("VerifyOTPCode", () => {
 	it("Should should return 200 if the code provided is valid", async () => {
 		const { sut } = makeSut();
 		const codeIsValid = await sut.verifyCode(defaultMockValues);
-		expect(codeIsValid.isValid).toBeTruthy();
+		expect(codeIsValid.isValidOTP).toBeTruthy();
 		expect(codeIsValid.statusCode).toBe(200);
 	});
 });

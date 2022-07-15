@@ -8,10 +8,10 @@ module.exports = class SendOTPEmailVerification {
 		this.emailManager = emailManager;
 	}
 
-	async sendEmailVerification({ _id, email }) {
-		if (!_id || !email) throw new Error("Missing params");
+	async sendEmailVerification({ userId, email }) {
+		if (!userId || !email) throw new Error("Missing params");
 
-		await this.deleteOTPRegister.deleteMany(_id);
+		await this.deleteOTPRegister.deleteMany(userId);
 
 		const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
 
@@ -27,7 +27,7 @@ module.exports = class SendOTPEmailVerification {
 		if (!hashedOTP) throw new Error("Error while trying encrypt OTP Code");
 
 		await this.insertOTPRegister.insert({
-			_id,
+			userId,
 			otp: hashedOTP,
 			createdAt: Date.now(),
 			expiresIn: Date.now() + 3600000,

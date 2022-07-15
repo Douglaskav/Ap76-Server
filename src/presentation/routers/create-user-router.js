@@ -36,7 +36,7 @@ module.exports = class LoginRouter {
 			);
 
 		const emailSent = await this.sendOTPEmailVerification.sendEmailVerification(
-			{ _id: newUser.insertedId, email }
+			{ userId: newUser.insertedId, email }
 		);
 		if (!emailSent || !emailSent.sentEmail)
 			return HttpResponseErrors.internalError(

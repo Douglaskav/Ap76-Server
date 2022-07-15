@@ -14,19 +14,19 @@ const makeEncrypter = () => {
 
 const makeInsertOTPRegister = () => {
 	class InsertOTPRegisterSpy {
-		async insert({ _id, otp, createdAt, expiresIn }) {
+		async insert({ userId, otp, createdAt, expiresIn }) {
 			return { insertedId: this.insertedId };
 		}
 	}
 
 	const insertOTPRegisterSpy = new InsertOTPRegisterSpy();
-	insertOTPRegisterSpy.insertedId = "any_id";
+	insertOTPRegisterSpy.insertedId = "any_userId";
 	return insertOTPRegisterSpy;
 };
 
 const makeDeleteOTPRegister = () => {
 	class DeleteOTPRegisterySpy {
-		async deleteMany(_id) {
+		async deleteMany(userId) {
 			return { deletedCount: this.deletedMany };
 		}
 	}
@@ -75,15 +75,15 @@ const makeSut = () => {
 	};
 };
 
-const defaultMockUser = { _id: "any_id", email: "any_mail@mail.com" };
+const defaultMockUser = { userId: "any_userId", email: "any_mail@mail.com" };
 
 describe("SendOTPEmailVerification", () => {
 	it("Should throw if the params are not provided correctly", () => {
 		const { sut } = makeSut();
 		const cases = [
-			{ _id: "any_id", email: "" },
-			{ _id: "", email: "any_mail@mail.com" },
-			{ _id: "", email: "" },
+			{ userId: "any_userId", email: "" },
+			{ userId: "", email: "any_mail@mail.com" },
+			{ userId: "", email: "" },
 		];
 
 		for (const index in cases) {
