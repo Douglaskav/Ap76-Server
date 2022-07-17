@@ -45,6 +45,6 @@ module.exports = class LoginRouter {
 
 		const { messageId, envelope } = emailSent.sentEmail;
 
-		return { body: { email, messageId, envelope }, statusCode: 200 };
+		return { body: { userId: newUser.insertedId, email, messageId, envelope }, statusCode: 200 };
 	}
 };

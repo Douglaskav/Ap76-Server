@@ -17,7 +17,7 @@ describe("InsertVerifyToUser Repository", () => {
     await MongoHelper.disconnect();
   });
 
-  it("Should throw if _id wasn't provided", () => {
+  it("Should throw if an email wasn't provided", () => {
     const sut = new InsertVerifyToUser();
     const promise = sut.verify({});
     expect(promise).rejects.toThrow();
@@ -25,7 +25,7 @@ describe("InsertVerifyToUser Repository", () => {
 
   it("Should throw if not was possible to update the user", () => {
     const sut = new InsertVerifyToUser();
-    const promise = sut.verify({ _id: "invalid_user_id" });
+    const promise = sut.verify({ email: "invalid_mail@mail.com" });
     expect(promise).rejects.toThrow("Not was possible update the user");
   });
 
@@ -42,7 +42,7 @@ describe("InsertVerifyToUser Repository", () => {
     let newUser = await userModel.insertOne(mockUser);
 
     const updatedUser = await sut.verify({
-      _id: newUser.insertedId,
+      email: mockUser.email,
       verifyTo: true,
     });
     expect(updatedUser.statusCode).toBe(200);

@@ -1,35 +1,35 @@
 const VerifyOTPCode = require("./verify-otp-code");
 
-const makeFindOTPRegisterByUserId = () => {
-	class FindOTPRegisterByUserIdSpy {
-		async find() {
+const makeLoadUserByEmailRepository = () => {
+	class LoadOTPRegisterByEmailSpy {
+		async load() {
 			return this.OTPRegister;
 		}
 	}
 
-	const findOTPRegisterByUserIdSpy = new FindOTPRegisterByUserIdSpy();
-	findOTPRegisterByUserIdSpy.OTPRegister = [
+	const loadOTPRegisterByEmailSpy = new LoadOTPRegisterByEmailSpy();
+	loadOTPRegisterByEmailSpy.OTPRegister = [
 		{
-			_id: "any_userId",
+			email: "any_email@mail.com",
 			otp: "hashedOTP",
 			createdAt: Date.now(),
 			expiresIn: Date.now() + 3600000,
 			length: 1,
 		},
 	];
-	return findOTPRegisterByUserIdSpy;
+	return loadOTPRegisterByEmailSpy;
 };
 
-const makeDeleteOTPRegisterByUserId = () => {
-	class DeleteOTPRegisteryByUserId {
+const makeDeleteOTPRegisterByEmail = () => {
+	class DeleteOTPRegisteryByEmailSpy {
 		async deleteMany() {
 			return this.deletedId;
 		}
 	}
 
-	const deleteOTPRegisterByUserId = new DeleteOTPRegisteryByUserId();
-	deleteOTPRegisterByUserId.deletedId = "any_otp_id";
-	return deleteOTPRegisterByUserId;
+	const deleteOTPRegisteryByEmailSpy = new DeleteOTPRegisteryByEmailSpy();
+	deleteOTPRegisteryByEmailSpy.deletedId = "any_otp_id";
+	return deleteOTPRegisteryByEmailSpy;
 };
 
 const makeInsertVerifyToUser = () => {
@@ -57,46 +57,46 @@ const makeEncrypter = () => {
 };
 
 const makeSut = () => {
-	const findOTPRegisterByUserIdSpy = makeFindOTPRegisterByUserId();
-	const deleteOTPRegisterByUserIdSpy = makeDeleteOTPRegisterByUserId();
+	const loadOTPRegisterByEmailSpy = makeLoadUserByEmailRepository();
+	const deleteOTPRegisterByEmailSpy = makeDeleteOTPRegisterByEmail();
 	const insertVerifyToUserSpy = makeInsertVerifyToUser();
 	const encrypterSpy = makeEncrypter();
 
 	const sut = new VerifyOTPCode({
-		findOTPRegisterByUserId: findOTPRegisterByUserIdSpy,
-		deleteOTPRegisterByUserId: deleteOTPRegisterByUserIdSpy,
+		loadOTPRegisterByEmail: loadOTPRegisterByEmailSpy,
+		deleteOTPRegisterByEmail: deleteOTPRegisterByEmailSpy,
 		insertVerifyToUser: insertVerifyToUserSpy,
 		encrypter: encrypterSpy,
 	});
 	return {
 		sut,
-		findOTPRegisterByUserIdSpy,
-		deleteOTPRegisterByUserIdSpy,
+		loadOTPRegisterByEmailSpy,
+		deleteOTPRegisterByEmailSpy,
 		insertVerifyToUserSpy,
 		encrypterSpy,
 	};
 };
 
-const defaultMockValues = { _id: "any_id", otp: 999999 };
+const defaultMockValues = { email: "any_email@mail.com", otp: 999999 };
 
 describe("VerifyOTPCode", () => {
-	it("should throw if userId or otp_code are not provided", () => {
+	it("should throw if email or otp_code are not provided", () => {
 		const { sut } = makeSut();
 		const cases = [
 			{},
-			{ _id: "", otp: "999999" },
-			{ _id: "any_userId", otp: "" },
+			{ email: "", otp: "999999" },
+			{ email: "any_userId", otp: "" },
 		];
 
 		for (const index in cases) {
 			const promise = sut.verifyCode(cases[index]);
-			expect(promise).rejects.toThrow("userId and OTP_code should be provided");
+			expect(promise).rejects.toThrow("email and OTP_code should be provided");
 		}
 	});
 
-	it("Should throw if findOTPRegisterByUserIdSpy don't found any register", async () => {
-		const { sut, findOTPRegisterByUserIdSpy } = makeSut();
-		findOTPRegisterByUserIdSpy.OTPRegister = { length: 0 };
+	it("Should throw if loadOTPRegisterByEmailSpy don't found any register", async () => {
+		const { sut, loadOTPRegisterByEmailSpy } = makeSut();
+		loadOTPRegisterByEmailSpy.OTPRegister = { length: 0 };
 		const promise = sut.verifyCode(defaultMockValues);
 		expect(promise).rejects.toThrow(
 			"Not was found an OTPRegistry for this user."
@@ -104,8 +104,8 @@ describe("VerifyOTPCode", () => {
 	});
 
 	it("Should return an unauthorizedError if the OTPCode was been expired", async () => {
-		const { sut, findOTPRegisterByUserIdSpy } = makeSut();
-		findOTPRegisterByUserIdSpy.OTPRegister[0].expiresIn = Date.now() - 3600000;
+		const { sut, loadOTPRegisterByEmailSpy } = makeSut();
+		loadOTPRegisterByEmailSpy.OTPRegister.expiresIn = Date.now() - 3600000;
 		const codeIsValid = await sut.verifyCode(defaultMockValues);
 		expect(codeIsValid.statusCode).toBe(401);
 		expect(codeIsValid.body.error).toBe("Code has expired. Please request another");

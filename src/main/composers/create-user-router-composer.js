@@ -1,15 +1,12 @@
 const CreateUserRouter = require("../../presentation/routers/create-user-router");
-
 const EmailValidator = require("../../utils/email-validator");
-
 const CreateUserUseCase = require("../../domain/usecases/create-user-usecase");
+const SendOTPEmailVerification = require("../../domain/usecases/send-otp-email-verification");
 const LoadUserByEmailRepository = require("../../infra/repositories/load-user-by-email-repository");
 const InsertUserRepository = require("../../infra/repositories/insert-user-repository");
 const Encrypter = require("../../utils/encrypter");
-
-const SendOTPEmailVerification = require("../../domain/usecases/send-otp-email-verification");
-const InsertOTPRegister = require("../../infra/repositories/insert-otp-registery-repository");
-const DeleteOTPRegister = require("../../infra/repositories/delete-otp-register-by-user-id-repository");
+const InsertOTPRegisteryRepository = require("../../infra/repositories/insert-otp-registery-repository");
+const DeleteOTPRegisteryByEmailRepository = require("../../infra/repositories/delete-otp-register-by-email");
 const EmailManager = require("../../utils/email-manager");
 
 module.exports = class CreateUserRouterComposer {
@@ -25,14 +22,14 @@ module.exports = class CreateUserRouterComposer {
       encrypter,
     });
 
-    const insertOTPRegister = new InsertOTPRegister();
-    const deleteOTPRegister = new DeleteOTPRegister();
+    const insertOTPRegister = new InsertOTPRegisteryRepository();
+    const deleteOTPRegister = new DeleteOTPRegisteryByEmailRepository();
     const emailManager = new EmailManager();
     const sendOTPEmailVerification = new SendOTPEmailVerification({
       encrypter,
       insertOTPRegister,
       deleteOTPRegister,
-      emailManager,
+      emailManager
     });
 
     const createUserRouter = new CreateUserRouter({

@@ -4,7 +4,7 @@ module.exports = class InsertOTPRegisteryRepository {
   async insert(otpRegister) {
     if (
       !otpRegister ||
-      !otpRegister.userId ||
+      !otpRegister.email ||
       !otpRegister.otp ||
       !otpRegister.createdAt ||
       !otpRegister.expiresIn

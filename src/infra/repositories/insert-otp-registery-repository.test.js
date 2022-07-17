@@ -31,7 +31,7 @@ describe("InsertOTPRegistery Repository", () => {
     const sut = makeSut();
     const mockDefaultUser = {
       _id: "any_id",
-      userId: "any_userId",
+      email: "valid_email@mail.com",
       otp: 999999,
       createdAt: Date.now(),
       expiresIn: Date.now() + 3600000,

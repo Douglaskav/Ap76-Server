@@ -11,7 +11,7 @@ module.exports = class SendOTPEmailVerification {
 	async sendEmailVerification({ userId, email }) {
 		if (!userId || !email) throw new Error("Missing params");
 
-		await this.deleteOTPRegister.deleteMany(userId);
+		await this.deleteOTPRegister.deleteMany(email);
 
 		const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
 
@@ -27,6 +27,7 @@ module.exports = class SendOTPEmailVerification {
 		if (!hashedOTP) throw new Error("Error while trying encrypt OTP Code");
 
 		await this.insertOTPRegister.insert({
+			email,
 			userId,
 			otp: hashedOTP,
 			createdAt: Date.now(),

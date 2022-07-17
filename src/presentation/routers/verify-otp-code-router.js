@@ -6,15 +6,15 @@ module.exports = class VerifyOTPCodeRouter {
 	}
 
 	async handle(httpRequest) {
-		if (!httpRequest || !httpRequest._id || !httpRequest.otp)
+		if (!httpRequest || !httpRequest.body)
 			return HttpResponseErrors.badRequest("Missing Params");
 
-		const { _id, otp } = httpRequest;
+		const { email, otp } = httpRequest.body;
 
-		const verifiedUser = await this.verifyOTPCode.verifyCode({ _id, otp });
+		const verifiedUser = await this.verifyOTPCode.verifyCode({ email, otp });
 		if (!verifiedUser.isValidOTP)
-			return HttpResponseErrors.badRequest("Not was possible check the code");
+			return HttpResponseErrors.badRequest(verifiedUser.body);
 
-		return { _id, verifiedUser };
+		return { body: { email, verifiedUser }, statusCode: 200 };
 	}
 };
