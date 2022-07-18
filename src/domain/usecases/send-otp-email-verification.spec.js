@@ -106,9 +106,10 @@ describe("SendOTPEmailVerification", () => {
 		expect(promise.statusCode).toBe(500);
 	});
 
-	it("Should return 200 if occured everything ok", async () => {
+	it("Should return the emailSent and otp code if occured everything ok", async () => {
 		const { sut } = makeSut();
 		const emailSent = await sut.sendEmailVerification(defaultMockUser);
-		expect(emailSent.statusCode).toBe(200);
+		expect(emailSent).toHaveProperty("sentEmail");
+		expect(emailSent).toHaveProperty("otp");
 	});
 });

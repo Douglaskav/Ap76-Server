@@ -104,9 +104,9 @@ describe("CreateUser UseCase", () => {
 		expect(promise).rejects.toThrow("An insertedId was not returned");
 	});
 
-	it("Should return 200 if the CreateUserUseCase was called with correct params", async () => {
+	it("Should return a new user if the CreateUserUseCase was called with correct params", async () => {
 		const { sut } = makeSut();
 		const user = await sut.create(defaultMockUser);
-		expect(user.statusCode).toBe(200);
+		expect(user).toHaveProperty("insertedId");
 	});
 });

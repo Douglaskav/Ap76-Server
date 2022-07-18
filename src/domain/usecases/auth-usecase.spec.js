@@ -84,4 +84,5 @@ describe("AuthUseCase", () => {
 		loadUserByEmailRepositorySpy.user = null;
 		const accessToken = await sut.auth("invalid_email@mail.com", "invalid_password");
 		expect(accessToken).toBeNull();
-	});                                                                     });
+	});                                                                  
+	   });

@@ -1,6 +1,5 @@
 const AuthUserRouter = require("./auth-user-router");
 
-// make the makeEmailValidatorSpy
 const makeEmailValidator = () => {
 	class EmailValidatorSpy {
 		isValid(email) {

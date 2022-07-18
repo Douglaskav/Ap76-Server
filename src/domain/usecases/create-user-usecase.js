@@ -38,6 +38,6 @@ module.exports = class CreateUserUseCase {
 		});
 		if (!newUser.insertedId) throw new Error("An insertedId was not returned");
 
-		return { insertedId: newUser.insertedId, statusCode: 200 };
+		return { insertedId: newUser.insertedId };
 	}
 };

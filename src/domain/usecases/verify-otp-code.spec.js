@@ -118,10 +118,9 @@ describe("VerifyOTPCode", () => {
 		expect(isValid.statusCode).toBe(401);
 	});
 
-	it("Should should return 200 if the code provided is valid", async () => {
+	it("Should return the isValidOTP boolean if the code provided is valid", async () => {
 		const { sut } = makeSut();
 		const codeIsValid = await sut.verifyCode(defaultMockValues);
-		expect(codeIsValid.isValidOTP).toBeTruthy();
-		expect(codeIsValid.statusCode).toBe(200);
+		expect(codeIsValid).toHaveProperty("isValidOTP");
 	});
 });
