@@ -40,6 +40,6 @@ module.exports = class SendOTPEmailVerification {
 				"Not was possible send the email"
 			);
 
-		return { sentEmail, statusCode: 200 };
+		return { sentEmail, otp, statusCode: 200 };
 	}
 };

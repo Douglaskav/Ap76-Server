@@ -15,6 +15,6 @@ module.exports = class VerifyOTPCodeRouter {
 		if (!verifiedUser.isValidOTP)
 			return HttpResponseErrors.badRequest(verifiedUser.body);
 
-		return { body: { email, verifiedUser }, statusCode: 200 };
+		return { body: { email, verifiedUser, otp }, statusCode: 200 };
 	}
 };

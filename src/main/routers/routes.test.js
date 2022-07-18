@@ -1,6 +1,7 @@
 const app = require("../app");
 const request = require("supertest");
 const MongoHelper = require("../../infra/helpers/mongo-helper");
+const bcrypt = require("bcrypt");
 let userModel;
 
 describe("#Routes suite case", () => {
@@ -29,12 +30,14 @@ describe("#Routes suite case", () => {
       .expect(200);
   });
 
-  it("Should test if /user/login it's ok", async () => {
-    await request(app).post("/user/create").send({
+  it("Should test if /user/login is working", async () => {
+    let mockUser = {
       username: "any_username",
       email: "any_valid_email@mail.com",
-      password: "any_password_to_hash",
-    });
+      password: bcrypt.hashSync("any_password_to_hash", 10)
+    }
+
+    await userModel.insertOne(mockUser);
 
     await request(app)
       .post("/user/login")
@@ -43,5 +46,18 @@ describe("#Routes suite case", () => {
         password: "any_password_to_hash",
       })
       .expect(200);
+  });
+
+  it("Should test if /user/verify is working", async () => {
+    const newUser = await request(app).post("/user/create").send({
+      username: "any_username",
+      email: "any_valid_email@mail.com",
+      password: "any_password_to_hash",
+    });
+
+    await request(app).post("/user/verify").send({
+      email: newUser.body.email,
+      otp: newUser.body.otp
+    }).expect(200);
   });
 });
