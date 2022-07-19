@@ -44,14 +44,14 @@ module.exports = class LoginRouter {
 				);
 			}
 
-			const { messageId, envelope, otp } = emailSent;
+			const { messageId, envelope } = emailSent;
 
 			return HttpResponse.success({
 				userId,
 				email,
 				messageId,
 				envelope,
-				otp,
+				otp: emailSent.otp,
 			});
 		} catch (error) {
 			return HttpResponse.internalError("Oh no! An internal error occured.");

@@ -6,9 +6,11 @@ const makeSendOTPEmailVerification = () => {
 			if (!this.messageId) return null;
 
 			return {
-				email: "accepted",
-				messageId: this.messageId,
-				rejected: [],
+				sentEmail: {
+					email: "accepted",
+					messageId: this.messageId,
+					rejected: [],
+				},
 			};
 		}
 	}
@@ -19,12 +21,34 @@ const makeSendOTPEmailVerification = () => {
 	return sendOTPEmailVerification;
 };
 
+const makeLoadOTPRegisterByEmail = () => {
+	class LoadOTPRegisterByEmailSpy {
+		async load() {
+			return this.OTPRegister;
+		}
+	}
+
+	const loadOTPRegisterByEmailSpy = new LoadOTPRegisterByEmailSpy();
+	loadOTPRegisterByEmailSpy.OTPRegister = [
+		{
+			email: "any_email@mail.com",
+			otp: "hashedOTP",
+			createdAt: Date.now(),
+			expiresIn: Date.now() + 3600000,
+			length: 1,
+		},
+	];
+	return loadOTPRegisterByEmailSpy;
+};
+
 const makeSut = () => {
 	const sendOTPEmailVerificationSpy = makeSendOTPEmailVerification();
+	const loadOTPRegisterByEmailSpy = makeLoadOTPRegisterByEmail();
 	const sut = new ResendOTPCodeRouter({
 		sendOTPEmailVerification: sendOTPEmailVerificationSpy,
+		loadOTPRegisterByEmail: loadOTPRegisterByEmailSpy,
 	});
-	return { sut, sendOTPEmailVerificationSpy };
+	return { sut, sendOTPEmailVerificationSpy, loadOTPRegisterByEmailSpy };
 };
 
 describe("ResendOTPCodeRouter", () => {
@@ -48,7 +72,18 @@ describe("ResendOTPCodeRouter", () => {
 		expect(httpResponse.statusCode).toBe(400);
 	});
 
-	it("Should return an 500 error if was't possible send the email", async () => {
+	it("Should return an error 401 if the OTPRegister doesn't exists", async () => {
+		const { sut, loadOTPRegisterByEmailSpy } = makeSut();
+		loadOTPRegisterByEmailSpy.OTPRegister = null;
+		const httpRequest = { body: { email: "any_email@mail.com" } };
+		const httpResponse = await sut.handle(httpRequest);
+		expect(httpResponse.statusCode).toBe(401);
+		expect(httpResponse.body.error).toBe(
+			"This user it's already verified or not exists, please login or sign up."
+		);
+	});
+
+	it("Should return an error 500 if was't possible send the email", async () => {
 		const { sut, sendOTPEmailVerificationSpy } = makeSut();
 		sendOTPEmailVerificationSpy.messageId = null;
 		const httpRequest = { body: { email: "any_email@mail.com" } };
@@ -58,12 +93,11 @@ describe("ResendOTPCodeRouter", () => {
 
 	it("Should return 200 if the email was sent", async () => {
 		const { sut } = makeSut();
-		const httpRequest = { body: { email: "any_email@mail.com" } };
+		const httpRequest = { body: { email: "valid_email@mail.com" } };
 		const httpResponse = await sut.handle(httpRequest);
 
 		expect(httpResponse.statusCode).toBe(200);
 		expect(httpResponse.body).toHaveProperty("messageId");
 		expect(httpResponse.body).toHaveProperty("envelope");
-		expect(httpResponse.body).toHaveProperty("otp");
 	});
 });

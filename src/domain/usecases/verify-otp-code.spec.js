@@ -1,6 +1,6 @@
 const VerifyOTPCode = require("./verify-otp-code");
 
-const makeLoadUserByEmailRepository = () => {
+const makeLoadOTPRegisterByEmail = () => {
 	class LoadOTPRegisterByEmailSpy {
 		async load() {
 			return this.OTPRegister;
@@ -57,7 +57,7 @@ const makeEncrypter = () => {
 };
 
 const makeSut = () => {
-	const loadOTPRegisterByEmailSpy = makeLoadUserByEmailRepository();
+	const loadOTPRegisterByEmailSpy = makeLoadOTPRegisterByEmail();
 	const deleteOTPRegisterByEmailSpy = makeDeleteOTPRegisterByEmail();
 	const insertVerifyToUserSpy = makeInsertVerifyToUser();
 	const encrypterSpy = makeEncrypter();

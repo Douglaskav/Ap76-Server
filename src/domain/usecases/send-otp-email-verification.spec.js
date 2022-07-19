@@ -91,8 +91,8 @@ describe("SendOTPEmailVerification", () => {
 	it("Should return 500 if not was possible to send the email", async () => {
 		const { sut, emailManagerSpy } = makeSut();
 		emailManagerSpy.messageId = null;
-		const promise = await sut.sendEmailVerification("valid_email@mail.com");
-		expect(promise.statusCode).toBe(500);
+		const httpResponse = await sut.sendEmailVerification("valid_email@mail.com");
+		expect(httpResponse.statusCode).toBe(500);
 	});
 
 	it("Should return the emailSent and otp code if occured everything ok", async () => {
