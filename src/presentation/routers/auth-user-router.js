@@ -7,26 +7,24 @@ module.exports = class LoginRouter {
 	}
 
 	async handle(httpRequest) {
-		if (!httpRequest || !httpRequest.body)
-			return HttpResponse.internalError(
-				"A valid httpRequest must be provided"
-			);
+		try {
+			const { email, password } = httpRequest.body;
+			if (!email || !password) {
+				return HttpResponse.badRequest("Missing params");
+			}
 
-		const { email, password } = httpRequest.body;
-		if (!email) return HttpResponse.badRequest("Missing param email");
-		if (!password)
-			return HttpResponse.badRequest("Missing param password");
+			if (!this.emailValidator.isValid(email)) {
+				return HttpResponse.badRequest("This is not a valid email");
+			}
 
-		const isEmailValid = !(await this.emailValidator.isValid(email));
-		if (isEmailValid)
-			return HttpResponse.badRequest("This is not a valid email");
+			const accessToken = await this.authUseCase.auth(email, password);
+			if (!accessToken) {
+				return HttpResponse.unauthorizedError("email or password incorrect");
+			}
 
-		const accessToken = await this.authUseCase.auth(email, password);
-		if (!accessToken)
-			return HttpResponse.unauthorizedError(
-				"email or password incorrect"
-			);
-
-		return HttpResponse.success({ email, accessToken });
+			return HttpResponse.success({ email, accessToken });
+		} catch (error) {
+			return HttpResponse.internalError("Oh no! An internal error occured.");
+		}
 	}
 };

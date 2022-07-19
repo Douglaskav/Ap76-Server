@@ -12,43 +12,52 @@ module.exports = class LoginRouter {
 	}
 
 	async handle(httpRequest) {
-		if (!httpRequest || !httpRequest.body)
-			return HttpResponse.internalError("A valid httpRequest must be provided");
+		try {
+			const { username, email, password } = httpRequest.body;
 
-		const { username, email, password } = httpRequest.body;
+			if (!this.emailValidator.isValid(email)) {
+				return HttpResponse.badRequest("This is not a valid email");
+			}
 
-		const isEmailValid = !(await this.emailValidator.isValid(email));
-		if (isEmailValid)
-			return HttpResponse.badRequest("This is not a valid email");
+			if (!username || !email || !password) {
+				return HttpResponse.badRequest("Missing param");
+			}
 
-		if (!username || !email || !password)
-			return HttpResponse.badRequest("Missing param");
+			const { insertedId: userId } = await this.createUserUseCase.create({
+				email,
+				username,
+				password,
+			});
 
-		const { insertedId: userId } = await this.createUserUseCase.create({
-			email,
-			username,
-			password,
-		});
+			if (!userId) {
+				return HttpResponse.internalError(
+					"Not was possible to create the user"
+				);
+			}
 
-		if (!userId)
-			return HttpResponse.internalError("Not was possible to create the user");
+			const emailSent =
+				await this.sendOTPEmailVerification.sendEmailVerification({
+					userId,
+					email,
+				});
 
-		const emailSent = await this.sendOTPEmailVerification.sendEmailVerification(
-			{ userId, email }
-		);
-		if (!emailSent)
-			return HttpResponse.internalError(
-				"An error occured while the email was sending"
-			);
+			if (!emailSent) {
+				return HttpResponse.internalError(
+					"An error occured while the email was sending"
+				);
+			}
 
-		const { messageId, envelope, otp } = emailSent;
+			const { messageId, envelope, otp } = emailSent;
 
-		return HttpResponse.success({
-			userId,
-			email,
-			messageId,
-			envelope,
-			otp,
-		});
+			return HttpResponse.success({
+				userId,
+				email,
+				messageId,
+				envelope,
+				otp,
+			});
+		} catch (error) {
+			return HttpResponse.internalError("Oh no! An internal error occured.");
+		}
 	}
 };

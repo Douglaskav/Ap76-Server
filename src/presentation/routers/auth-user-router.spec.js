@@ -41,18 +41,16 @@ const makeSut = () => {
 };
 
 describe("AuthUserRouter", () => {
-	it("Should return 400 if no email is provided", async () => {
+	it("Should return 400 if invalid params are provided", async () => {
 		const { sut } = makeSut();
-		const httpRequest = { body: { password: "any_password" } };
-		const httpResponse = await sut.handle(httpRequest);
-		expect(httpResponse.statusCode).toBe(400);
-	});
-
-	it("Should return 400 if no password is provided", async () => {
-		const { sut } = makeSut();
-		const httpRequest = { body: { email: "any_email@mail.com" } };
-		const httpResponse = await sut.handle(httpRequest);
-		expect(httpResponse.statusCode).toBe(400);
+		const cases = [
+			{ body: { email: "any_email@mail.com" } },
+			{ body: { password: "any_password" } },
+		];
+		for (let index in cases) {
+			const httpResponse = await sut.handle(cases[index]);
+			expect(httpResponse.statusCode).toBe(400);
+		}
 	});
 
 	it("Should return 400 if an invalid email is provided", async () => {

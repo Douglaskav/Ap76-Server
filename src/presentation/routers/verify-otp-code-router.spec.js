@@ -26,7 +26,7 @@ describe("VerifyOTPCodeRouter", () => {
 		const { sut } = makeSut();
 		const httpRequest = null;
 		const httpResponse = await sut.handle(httpRequest);
-		expect(httpResponse.statusCode).toBe(400);
+		expect(httpResponse.statusCode).toBe(500);
 	});
 
 	it("Should throw if not was possible check the code", async () => {
