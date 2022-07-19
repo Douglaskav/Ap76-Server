@@ -1,4 +1,4 @@
-const HttpResponseErrors = require("../../utils/http-response-errors");
+const HttpResponse = require("../../utils/http-response");
 
 module.exports = class AuthUseCase {
 	constructor({ loadUserByEmailRepository, tokenGenerator, encrypter } = {}) {
@@ -8,9 +8,9 @@ module.exports = class AuthUseCase {
 	}
 
 	async auth(email, password) {
-		if (!email) return HttpResponseErrors.badRequest("Missing param email");
+		if (!email) return HttpResponse.badRequest("Missing param email");
 		if (!password)
-			return HttpResponseErrors.badRequest("Missing param password");
+			return HttpResponse.badRequest("Missing param password");
 
 		const user = await this.loadUserByEmailRepository.load(email);
 		const isValid = user && await this.encrypter.compare(password, user.password);

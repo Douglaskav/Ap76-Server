@@ -1,5 +1,5 @@
 const MongoHelper = require("../helpers/mongo-helper");
-const HttpResponseErrors = require("../../utils/http-response-errors");
+const HttpResponse = require("../../utils/http-response");
 
 module.exports = class InsertVerifyToUser {
   async verify({ email, verifyTo = false }) {
@@ -11,9 +11,7 @@ module.exports = class InsertVerifyToUser {
       { email },
       { $set: { verified: verifyTo } }
     );
-    if (updatedUser.modifiedCount <= 0)
-      //Move to an httpResponseError
-      throw new Error("Not was possible update the user");
+    if (updatedUser.modifiedCount <= 0) return HttpResponse.unauthorizedError("Not was possible update the user");
 
     return { updatedUser, statusCode: 200 };
   }

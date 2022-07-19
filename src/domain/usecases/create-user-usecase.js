@@ -1,4 +1,4 @@
-const HttpResponseErrors = require("../../utils/http-response-errors");
+const HttpResponse = require("../../utils/http-response");
 
 module.exports = class CreateUserUseCase {
 	constructor({
@@ -16,7 +16,7 @@ module.exports = class CreateUserUseCase {
 
 		const user = await this.loadUserByEmailRepository.load(email);
 		if (user)
-			return HttpResponseErrors.conflictError(
+			return HttpResponse.conflictError(
 				"Already existe an user with this email."
 			);
 
@@ -26,7 +26,7 @@ module.exports = class CreateUserUseCase {
 			SALT_ROUNDS	
 		);
 		if (!hashedPassword)
-			return HttpResponseErrors.internalError(
+			return HttpResponse.internalError(
 				"Not was possible encrypted the password"
 			);
 

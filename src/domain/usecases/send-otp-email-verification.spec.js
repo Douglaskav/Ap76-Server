@@ -48,8 +48,7 @@ const makeEmailManager = () => {
 	}
 
 	const emailManagerSpy = new EmailManagerSpy();
-	emailManagerSpy.messageId =
-		"<b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>";
+	emailManagerSpy.messageId = "<b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>";
 	return emailManagerSpy;
 };
 

@@ -1,4 +1,4 @@
-const HttpResponseErrors = require("../../utils/http-response-errors");
+const HttpResponse = require("../../utils/http-response");
 
 module.exports = class SendOTPEmailVerification {
 	constructor({ encrypter, insertOTPRegister, deleteOTPRegister, emailManager } = {}) {
@@ -36,7 +36,7 @@ module.exports = class SendOTPEmailVerification {
 
 		let sentEmail = await this.emailManager.sendMail(mailOptions);
 		if (!sentEmail || !sentEmail.messageId)
-			return HttpResponseErrors.internalError(
+			return HttpResponse.internalError(
 				"Not was possible send the email"
 			);
 

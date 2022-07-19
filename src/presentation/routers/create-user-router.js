@@ -1,4 +1,4 @@
-const HttpResponseErrors = require("../../utils/http-response-errors");
+const HttpResponse = require("../../utils/http-response");
 
 module.exports = class LoginRouter {
 	constructor({
@@ -13,49 +13,42 @@ module.exports = class LoginRouter {
 
 	async handle(httpRequest) {
 		if (!httpRequest || !httpRequest.body)
-			return HttpResponseErrors.internalError(
-				"A valid httpRequest must be provided"
-			);
+			return HttpResponse.internalError("A valid httpRequest must be provided");
 
 		const { username, email, password } = httpRequest.body;
 
 		const isEmailValid = !(await this.emailValidator.isValid(email));
 		if (isEmailValid)
-			return HttpResponseErrors.badRequest("This is not a valid email");
+			return HttpResponse.badRequest("This is not a valid email");
 
 		if (!username || !email || !password)
-			return HttpResponseErrors.badRequest("Missing param");
+			return HttpResponse.badRequest("Missing param");
 
-		const newUser = await this.createUserUseCase.create({
+		const { insertedId: userId } = await this.createUserUseCase.create({
 			email,
 			username,
 			password,
 		});
 
-		if (!newUser.insertedId)
-			return HttpResponseErrors.internalError(
-				"Not was possible to create the user"
-			);
+		if (!userId)
+			return HttpResponse.internalError("Not was possible to create the user");
 
 		const emailSent = await this.sendOTPEmailVerification.sendEmailVerification(
-			{ userId: newUser.insertedId, email }
+			{ userId, email }
 		);
 		if (!emailSent)
-			return HttpResponseErrors.internalError(
+			return HttpResponse.internalError(
 				"An error occured while the email was sending"
 			);
 
 		const { messageId, envelope, otp } = emailSent;
 
-		return {
-			body: {
-				userId: newUser.insertedId,
-				email,
-				messageId,
-				envelope,
-				otp
-			},
-			statusCode: 200,
-		};
+		return HttpResponse.success({
+			userId,
+			email,
+			messageId,
+			envelope,
+			otp,
+		});
 	}
 };

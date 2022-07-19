@@ -14,4 +14,8 @@ module.exports = class HttpResponseErrors {
   static conflictError(error) {
     return { body: { error }, statusCode: 409 };
   }
+
+  static success(body) {
+    return { body, statusCode: 200 };
+  }
 };

@@ -23,10 +23,11 @@ describe("InsertVerifyToUser Repository", () => {
     expect(promise).rejects.toThrow();
   });
 
-  it("Should throw if not was possible to update the user", () => {
+  it("Should throw if not was possible to update the user", async () => {
     const sut = new InsertVerifyToUser();
-    const promise = sut.verify({ email: "invalid_mail@mail.com" });
-    expect(promise).rejects.toThrow("Not was possible update the user");
+    const httpResponse = await sut.verify({ email: "invalid_mail@mail.com" });
+    expect(httpResponse.statusCode).toBe(401);
+    expect(httpResponse.body.error).toBe("Not was possible update the user");
   });
 
   it("Should update the user without error and return 200", async () => {
