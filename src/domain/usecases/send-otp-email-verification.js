@@ -8,8 +8,8 @@ module.exports = class SendOTPEmailVerification {
 		this.emailManager = emailManager;
 	}
 
-	async sendEmailVerification({ userId, email }) {
-		if (!userId || !email) throw new Error("Missing params");
+	async sendEmailVerification(email) {
+		if (!email) return HttpResponse.badRequest("Missing params");
 
 		await this.deleteOTPRegister.deleteMany(email);
 
@@ -24,11 +24,10 @@ module.exports = class SendOTPEmailVerification {
 
 		const SALT_ROUNDS = 8;
 		const hashedOTP = await this.encrypter.generateHash(otp, SALT_ROUNDS);
-		if (!hashedOTP) throw new Error("Error while trying encrypt OTP Code");
+		if (!hashedOTP) return HttpResponse.internalError("Error while trying encrypt OTP Code");
 
 		await this.insertOTPRegister.insert({
 			email,
-			userId,
 			otp: hashedOTP,
 			createdAt: Date.now(),
 			expiresIn: Date.now() + 3600000,
@@ -36,9 +35,7 @@ module.exports = class SendOTPEmailVerification {
 
 		let sentEmail = await this.emailManager.sendMail(mailOptions);
 		if (!sentEmail || !sentEmail.messageId)
-			return HttpResponse.internalError(
-				"Not was possible send the email"
-			);
+			return HttpResponse.internalError("Not was possible send the email");
 
 		return { sentEmail, otp };
 	}

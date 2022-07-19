@@ -48,7 +48,8 @@ const makeEmailManager = () => {
 	}
 
 	const emailManagerSpy = new EmailManagerSpy();
-	emailManagerSpy.messageId = "<b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>";
+	emailManagerSpy.messageId =
+		"<b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>";
 	return emailManagerSpy;
 };
 
@@ -72,40 +73,31 @@ const makeSut = () => {
 	};
 };
 
-const defaultMockUser = { userId: "any_userId", email: "any_mail@mail.com" };
-
 describe("SendOTPEmailVerification", () => {
-	it("Should throw if the params are not provided correctly", () => {
+	it("Should return an error 400 if the params are not provided correctly", async () => {
 		const { sut } = makeSut();
-		const cases = [
-			{ userId: "any_userId", email: "" },
-			{ userId: "", email: "any_mail@mail.com" },
-			{ userId: "", email: "" },
-		];
-
-		for (const index in cases) {
-			const promise = sut.sendEmailVerification(cases[index]);
-			expect(promise).rejects.toThrow("Missing params");
-		}
+		const httpResponse = await sut.sendEmailVerification("");
+		expect(httpResponse.body.error).toBe("Missing params");
+		expect(httpResponse.statusCode).toBe(400);
 	});
 
-	it("Should throw if was not possible encrypt the OTP Code", () => {
+	it("Should return an error 500 if was't possible encrypt the OTP Code", async () => {
 		const { sut, encrypterSpy } = makeSut();
 		encrypterSpy.hash = null;
-		const promise = sut.sendEmailVerification(defaultMockUser);
-		expect(promise).rejects.toThrow();
+		const httpResponse = await sut.sendEmailVerification("valid_email@mail.com");
+		expect(httpResponse.statusCode).toBe(500);
 	});
 
 	it("Should return 500 if not was possible to send the email", async () => {
 		const { sut, emailManagerSpy } = makeSut();
 		emailManagerSpy.messageId = null;
-		const promise = await sut.sendEmailVerification(defaultMockUser);
+		const promise = await sut.sendEmailVerification("valid_email@mail.com");
 		expect(promise.statusCode).toBe(500);
 	});
 
 	it("Should return the emailSent and otp code if occured everything ok", async () => {
 		const { sut } = makeSut();
-		const emailSent = await sut.sendEmailVerification(defaultMockUser);
+		const emailSent = await sut.sendEmailVerification("valid_email@mail.com");
 		expect(emailSent).toHaveProperty("sentEmail");
 		expect(emailSent).toHaveProperty("otp");
 	});

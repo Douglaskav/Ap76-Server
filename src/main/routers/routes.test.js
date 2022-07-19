@@ -19,7 +19,7 @@ describe("#Routes suite case", () => {
     await MongoHelper.disconnect();
   });
 
-  it("Should test if /use/create is working", async () => {
+  it("Should test if /user/create is working", async () => {
     await request(app)
       .post("/user/create")
       .send({
