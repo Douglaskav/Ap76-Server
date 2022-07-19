@@ -1,4 +1,4 @@
-const HttpResponseErrors = require("../../utils/http-response-errors");
+const HttpResponse = require("../../utils/http-response");
 
 module.exports = class LoginRouter {
 	constructor({ emailValidator, authUseCase } = {}) {
@@ -8,25 +8,25 @@ module.exports = class LoginRouter {
 
 	async handle(httpRequest) {
 		if (!httpRequest || !httpRequest.body)
-			return HttpResponseErrors.internalError(
+			return HttpResponse.internalError(
 				"A valid httpRequest must be provided"
 			);
 
 		const { email, password } = httpRequest.body;
-		if (!email) return HttpResponseErrors.badRequest("Missing param email");
+		if (!email) return HttpResponse.badRequest("Missing param email");
 		if (!password)
-			return HttpResponseErrors.badRequest("Missing param password");
+			return HttpResponse.badRequest("Missing param password");
 
 		const isEmailValid = !(await this.emailValidator.isValid(email));
 		if (isEmailValid)
-			return HttpResponseErrors.badRequest("This is not a valid email");
+			return HttpResponse.badRequest("This is not a valid email");
 
 		const accessToken = await this.authUseCase.auth(email, password);
 		if (!accessToken)
-			return HttpResponseErrors.unauthorizedError(
+			return HttpResponse.unauthorizedError(
 				"email or password incorrect"
 			);
 
-		return { body: { email, accessToken }, statusCode: 200 };
+		return HttpResponse.success({ email, accessToken });
 	}
 };

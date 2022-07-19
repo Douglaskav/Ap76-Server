@@ -1,4 +1,4 @@
-const HttpResponseErrors = require("./http-response-errors");
+const HttpResponse = require("./http-response");
 const jwt = require("jsonwebtoken");
 
 module.exports = class TokenGenerator {

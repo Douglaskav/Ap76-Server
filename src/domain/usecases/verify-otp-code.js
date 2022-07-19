@@ -1,4 +1,4 @@
-const HttpResponseErrors = require("../../utils/http-response-errors");
+const HttpResponse = require("../../utils/http-response");
 
 module.exports = class VerifyOTPCode {
 	constructor({
@@ -25,14 +25,14 @@ module.exports = class VerifyOTPCode {
 		const { expiresIn, otp: hashedOTP } = otpVerificationCode;
 		if (Date.now() > expiresIn) {
 			await this.deleteOTPRegisterByEmail.deleteMany({ email });
-			return HttpResponseErrors.unauthorizedError(
+			return HttpResponse.unauthorizedError(
 				"Code has expired. Please request another"
 			);
 		}
 
 		const isValidOTP = await this.encrypter.compare(otp, hashedOTP);
 		if (!isValidOTP)
-			return HttpResponseErrors.unauthorizedError(
+			return HttpResponse.unauthorizedError(
 				"Invalid code passed; Check your email"
 			);
 
