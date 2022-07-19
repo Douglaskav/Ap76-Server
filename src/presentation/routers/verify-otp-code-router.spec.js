@@ -2,7 +2,7 @@ const VerifyOTPCodeRouter = require("./verify-otp-code-router");
 
 const makeVerifyOTPCode = () => {
 	class VerifyOTPCodeSpy {
-		async verifyCode() {
+		async verify() {
 			return {
 				isValidOTP: this.isValidOTP,
 				statusCode: 200,

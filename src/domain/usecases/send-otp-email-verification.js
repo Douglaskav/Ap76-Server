@@ -34,7 +34,7 @@ module.exports = class SendOTPEmailVerification {
 			expiresIn: Date.now() + 3600000,
 		});
 
-		let { sentEmail } = await this.emailManager.sendMail(mailOptions);
+		let sentEmail = await this.emailManager.sendMail(mailOptions);
 		if (!sentEmail || !sentEmail.messageId)
 			return HttpResponseErrors.internalError(
 				"Not was possible send the email"

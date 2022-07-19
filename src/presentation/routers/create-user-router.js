@@ -20,9 +20,11 @@ module.exports = class LoginRouter {
 		const { username, email, password } = httpRequest.body;
 
 		const isEmailValid = !(await this.emailValidator.isValid(email));
-		if (isEmailValid) return HttpResponseErrors.badRequest("This is not a valid email");
+		if (isEmailValid)
+			return HttpResponseErrors.badRequest("This is not a valid email");
 
-		if (!username || !email || !password) return HttpResponseErrors.badRequest("Missing param");
+		if (!username || !email || !password)
+			return HttpResponseErrors.badRequest("Missing param");
 
 		const newUser = await this.createUserUseCase.create({
 			email,
@@ -38,13 +40,22 @@ module.exports = class LoginRouter {
 		const emailSent = await this.sendOTPEmailVerification.sendEmailVerification(
 			{ userId: newUser.insertedId, email }
 		);
-		if (!emailSent || !emailSent.sentEmail)
+		if (!emailSent)
 			return HttpResponseErrors.internalError(
 				"An error occured while the email was sending"
 			);
 
-		const { messageId, envelope } = emailSent.sentEmail;
+		const { messageId, envelope, otp } = emailSent;
 
-		return { body: { userId: newUser.insertedId, email, messageId, envelope, otp: emailSent.otp }, statusCode: 200 };
+		return {
+			body: {
+				userId: newUser.insertedId,
+				email,
+				messageId,
+				envelope,
+				otp
+			},
+			statusCode: 200,
+		};
 	}
 };

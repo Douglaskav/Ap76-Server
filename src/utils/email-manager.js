@@ -20,6 +20,6 @@ module.exports = class EmailManager {
     });
 
     const sentEmail = await transporter.sendMail(mailOptions);
-    return { sentEmail, statusCode: 200 };
+    return sentEmail;
   }
 }

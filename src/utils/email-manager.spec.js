@@ -65,7 +65,6 @@ describe("EmailManager", () => {
       html: `<p>Enter <b> 123456</b> in the app to verify your email address`,
     });
 
-    expect(emailSent.sentEmail.rejected).toStrictEqual([]);
-    expect(emailSent.statusCode).toBe(200);
+    expect(emailSent.rejected).toStrictEqual([]);
   });
 });

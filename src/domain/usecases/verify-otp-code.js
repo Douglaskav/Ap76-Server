@@ -13,7 +13,7 @@ module.exports = class VerifyOTPCode {
 		this.encrypter = encrypter;
 	}
 
-	async verifyCode({ email, otp }) {
+	async verify({ email, otp }) {
 		if (!email || !otp) throw new Error("email and OTP_code should be provided");
 
 		const otpVerificationCode =

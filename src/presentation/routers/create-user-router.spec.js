@@ -32,11 +32,9 @@ const makeSendOTPEmailVerification = () => {
 			if (!this.messageId) return null;
 
 			return {
-				sentEmail: {
 					email: "accepted",
 					messageId: this.messageId,
 					rejected: [],
-				},
 			};
 		}
 	}
@@ -130,7 +128,6 @@ describe("CreateUserRouter", () => {
 	it("Should return 200 if the user was been created without errors", async () => {
 		const { sut } = makeSut();
 		const httpResponse = await sut.handle(defaultMockHttpRequest);
-		expect(httpResponse.statusCode).toBe(200);
 		expect(httpResponse.body).toHaveProperty("messageId");
 	});
 });

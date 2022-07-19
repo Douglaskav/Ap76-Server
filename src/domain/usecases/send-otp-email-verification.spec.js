@@ -40,11 +40,9 @@ const makeEmailManager = () => {
 	class EmailManagerSpy {
 		async sendMail() {
 			return {
-				sentEmail: {
-					email: "accepted",
-					messageId: this.messageId,
-					rejected: [],
-				},
+				email: "accepted",
+				messageId: this.messageId,
+				rejected: [],
 			};
 		}
 	}
