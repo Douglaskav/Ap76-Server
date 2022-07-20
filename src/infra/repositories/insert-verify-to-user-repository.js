@@ -11,8 +11,9 @@ module.exports = class InsertVerifyToUser {
       { email },
       { $set: { verified: verifyTo } }
     );
-    if (updatedUser.modifiedCount <= 0) return HttpResponse.unauthorizedError("Not was possible update the user");
+    if (updatedUser.modifiedCount <= 0)
+      return HttpResponse.unauthorizedError("Not was possible update the user");
 
-    return { updatedUser, statusCode: 200 };
+    return updatedUser;
   }
 };

@@ -35,7 +35,6 @@ describe("DeleteOtpRegisterByEmail Repository", () => {
     let newUser = await otpModel.insertOne(mockUser);
     
     const deletedUser = await sut.deleteMany(mockUser.email)
-    expect(deletedUser.statusCode).toBe(200);
-    expect(deletedUser.deletedOTPRegister.deletedCount).not.toBe(0);
+    expect(deletedUser.deletedCount).not.toBe(0);
   });
 });

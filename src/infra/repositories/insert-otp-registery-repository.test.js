@@ -37,9 +37,6 @@ describe("InsertOTPRegistery Repository", () => {
       expiresIn: Date.now() + 3600000,
     };
     const insertedOtpRegister = await sut.insert(mockDefaultUser);
-    expect(insertedOtpRegister.statusCode).toBe(200);
-    expect(insertedOtpRegister.insertedOtpRegister).toHaveProperty(
-      "insertedId"
-    );
+    expect(insertedOtpRegister).toHaveProperty("insertedId");
   });
 });
