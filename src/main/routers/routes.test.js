@@ -57,6 +57,10 @@ describe("#Routes suite case", () => {
       password: "any_password_to_hash",
     });
 
+    /**
+     *
+     * change the otp code to be 999999.
+     */
     let SALT_ROUND = 8;
     await otpModel.updateOne(
       { email: newUser.body.email },

@@ -13,7 +13,7 @@ module.exports = class VerifyOTPCodeRouter {
 			if (!verifiedUser.isValidOTP)
 				return HttpResponse.unauthorizedError("Not was possible verify the user!");
 
-			return HttpResponse.success({ email, verifiedUser, otp });
+			return HttpResponse.success({ email, verifiedUser });
 		} catch (error) {
 			return HttpResponse.internalError("Oh no! An internal error occured.");
 		}
