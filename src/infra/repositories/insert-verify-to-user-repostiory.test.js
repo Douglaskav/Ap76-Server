@@ -46,6 +46,6 @@ describe("InsertVerifyToUser Repository", () => {
       email: mockUser.email,
       verifyTo: true,
     });
-    expect(updatedUser.statusCode).toBe(200);
+    expect(updatedUser.deletedCount).not.toBe(0);
   });
 });

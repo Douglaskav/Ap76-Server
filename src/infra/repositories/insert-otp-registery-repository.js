@@ -15,6 +15,6 @@ module.exports = class InsertOTPRegisteryRepository {
     const otpModel = db.collection("otpRegisters");     
     const insertedOtpRegister = await otpModel.insertOne(otpRegister); 
 
-    return { insertedOtpRegister, statusCode: 200 };
+    return insertedOtpRegister;
   }
 };

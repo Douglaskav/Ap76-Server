@@ -8,6 +8,6 @@ module.exports = class DeleteOTPRegisteryByEmail {
     const optModel = db.collection("otpRegisters");
     const deletedOTPRegister = await optModel.deleteMany({ email });
 
-    return { deletedOTPRegister, statusCode: 200 }
+    return deletedOTPRegister;
   }
-}
+};
