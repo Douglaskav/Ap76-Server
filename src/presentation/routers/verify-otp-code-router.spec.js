@@ -5,7 +5,6 @@ const makeVerifyOTPCode = () => {
 		async verify() {
 			return {
 				isValidOTP: this.isValidOTP,
-				statusCode: 200,
 			};
 		}
 	}
@@ -37,8 +36,7 @@ describe("VerifyOTPCodeRouter", () => {
 			body: { email: "any_email@mail.com", otp: "any_otp" },
 		};
 		const httpResponse = await sut.handle(httpRequest);
-
-		expect(httpResponse.statusCode).toBe(400);
+		expect(httpResponse.statusCode).toBe(401);
 	});
 
 	it("Should verify the user without errors", async () => {

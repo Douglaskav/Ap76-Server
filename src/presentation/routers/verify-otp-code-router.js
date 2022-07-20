@@ -11,7 +11,7 @@ module.exports = class VerifyOTPCodeRouter {
 
 			const verifiedUser = await this.verifyOTPCode.verify({ email, otp });
 			if (!verifiedUser.isValidOTP)
-				return HttpResponse.badRequest(verifiedUser.body);
+				return HttpResponse.unauthorizedError("Not was possible verify the user!");
 
 			return HttpResponse.success({ email, verifiedUser, otp });
 		} catch (error) {

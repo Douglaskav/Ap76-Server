@@ -36,10 +36,7 @@ module.exports = class LoginRouter {
 			}
 
 			const emailSent =
-				await this.sendOTPEmailVerification.sendEmailVerification({
-					userId,
-					email,
-				});
+				await this.sendOTPEmailVerification.sendEmailVerification(email);
 
 			if (!emailSent) {
 				return HttpResponse.internalError(
@@ -47,14 +44,13 @@ module.exports = class LoginRouter {
 				);
 			}
 
-			const { messageId, envelope, otp } = emailSent;
+			const { messageId, envelope } = emailSent;
 
 			return HttpResponse.success({
 				userId,
 				email,
 				messageId,
 				envelope,
-				otp,
 			});
 		} catch (error) {
 			return HttpResponse.internalError("Oh no! An internal error occured.");
