@@ -6,11 +6,9 @@ const makeSendOTPEmailVerification = () => {
 			if (!this.messageId) return null;
 
 			return {
-				sentEmail: {
-					email: "accepted",
-					messageId: this.messageId,
-					rejected: [],
-				},
+				email: "accepted",
+				messageId: this.messageId,
+				rejected: [],
 			};
 		}
 	}

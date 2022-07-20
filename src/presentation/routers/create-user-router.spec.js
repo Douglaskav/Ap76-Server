@@ -67,7 +67,7 @@ const makeSut = () => {
 const defaultMockHttpRequest = {
 	body: {
 		username: "any_username",
-		email: "any_email",
+		email: "valid_email@mail.com",
 		password: "any_password",
 	},
 };

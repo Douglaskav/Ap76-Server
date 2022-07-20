@@ -51,7 +51,6 @@ module.exports = class LoginRouter {
 				email,
 				messageId,
 				envelope,
-				otp: emailSent.otp,
 			});
 		} catch (error) {
 			return HttpResponse.internalError("Oh no! An internal error occured.");

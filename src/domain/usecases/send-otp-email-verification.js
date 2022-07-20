@@ -37,6 +37,6 @@ module.exports = class SendOTPEmailVerification {
 		if (!sentEmail || !sentEmail.messageId)
 			return HttpResponse.internalError("Not was possible send the email");
 
-		return { sentEmail, otp };
+		return sentEmail;
 	}
 };

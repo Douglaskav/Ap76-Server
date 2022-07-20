@@ -29,7 +29,7 @@ module.exports = class ResendOTPCodeRouter {
 				);
 			}
 
-			const { messageId, envelope } = sentEmail.sentEmail;
+			const { messageId, envelope } = sentEmail;
 
 			return HttpResponse.success({ messageId, envelope });
 		} catch (error) {

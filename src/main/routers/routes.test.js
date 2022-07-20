@@ -51,20 +51,23 @@ describe("#Routes suite case", () => {
   });
 
   it("Should test if /user/verify is working", async () => {
-    /**
-     * @todo stop return the otp code from user creation http-response
-     **/
     const newUser = await request(app).post("/user/create").send({
       username: "any_username",
       email: "any_valid_email@mail.com",
       password: "any_password_to_hash",
     });
 
+    let SALT_ROUND = 8;
+    await otpModel.updateOne(
+      { email: newUser.body.email },
+      { $set: { otp: bcrypt.hashSync("999999", 8) } }
+    );
+
     await request(app)
       .post("/user/verify")
       .send({
         email: newUser.body.email,
-        otp: newUser.body.otp,
+        otp: "999999",
       })
       .expect(200);
   });
