@@ -8,10 +8,8 @@ const Encrypter = require("../../utils/encrypter");
 
 module.exports = class VerifyUserRouterComposer {
 	static compose() {
-		const loadOTPRegisterByEmail =
-			new LoadOTPRegisterByEmail();
-		const deleteOTPRegisterByEmail =
-			new DeleteOTPRegisterByEmail();
+		const loadOTPRegisterByEmail = new LoadOTPRegisterByEmail();
+		const deleteOTPRegisterByEmail = new DeleteOTPRegisterByEmail();
 		const insertVerifyToUser = new InsertVerifyToUser();
 		const encrypter = new Encrypter();
 

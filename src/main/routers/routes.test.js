@@ -36,10 +36,14 @@ describe("#Routes suite case", () => {
     let mockUser = {
       username: "any_username",
       email: "any_valid_email@mail.com",
-      password: bcrypt.hashSync("any_password_to_hash", 10),
+      password: bcrypt.hashSync("any_password_to_hash", 8),
     };
 
     await userModel.insertOne(mockUser);
+    await userModel.updateOne(
+      { email: mockUser.email },
+      { $set: { verified: true } }
+    );
 
     await request(app)
       .post("/user/login")
