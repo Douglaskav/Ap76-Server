@@ -8,6 +8,7 @@ module.exports = class VerifyOTPCodeRouter {
 	async handle(httpRequest) {
 		try {
 			const { email, otp } = httpRequest.body;
+			if (!email || !otp) return HttpResponse.badRequest("Missing params");
 
 			const verifiedUser = await this.verifyOTPCode.verify({ email, otp });
 			if (!verifiedUser.isValidOTP)

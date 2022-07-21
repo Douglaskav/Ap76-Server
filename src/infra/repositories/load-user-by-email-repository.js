@@ -9,7 +9,8 @@ module.exports = class LoadUserByEmailRepository {
     const userModel = db.collection("users");
     const user = await userModel.findOne({
       email
-    })
+    });
+    
     return user
   }
 }
