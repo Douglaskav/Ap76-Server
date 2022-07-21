@@ -18,13 +18,13 @@ module.exports = class AuthUseCase {
 		if (!password) throw new Error("Missing param password");
 
 		const user = await this.loadUserByEmailRepository.load(email);
-		const isValid = user && await this.encrypter.compare(password, user.password);
+		const isValid =
+			user && (await this.encrypter.compare(password, user.password));
 
 		if (isValid) {
-			const hasAnOTPRegister = await this.loadOTPRegisterByEmail.load(
-				user.email
-			);
-			if (user.verified && !hasAnOTPRegister) {
+			const hasOTPRegister = await this.loadOTPRegisterByEmail.load(user.email);
+
+			if (user.verified && !hasOTPRegister) {
 				const accessToken = await this.tokenGenerator.generate(user._id);
 				return accessToken;
 			}
@@ -32,6 +32,6 @@ module.exports = class AuthUseCase {
 			return { error: "You must verify your email, please confirm the code." };
 		}
 
-		return null;
+		return { error: "email or password incorrect" };
 	}
 };

@@ -18,10 +18,6 @@ module.exports = class LoginRouter {
 			}
 
 			const accessToken = await this.authUseCase.auth(email, password);
-			if (!accessToken) {
-				return HttpResponse.unauthorizedError("email or password incorrect");
-			}
-
 			if (accessToken.error) {
 				return HttpResponse.unauthorizedError(accessToken.error);
 			}

@@ -110,6 +110,6 @@ describe("AuthUseCase", () => {
 			"invalid_email@mail.com",
 			"invalid_password"
 		);
-		expect(accessToken).toBeNull();
+		expect(accessToken.error).toBe("email or password incorrect");
 	});
 });

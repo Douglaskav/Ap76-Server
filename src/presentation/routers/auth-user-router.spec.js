@@ -91,7 +91,7 @@ describe("AuthUserRouter", () => {
 
 	it("Should return 401 if the email or password provided are incorrect", async () => {
 		const { sut, authUseCaseSpy } = makeSut();
-		authUseCaseSpy.accessToken = null;
+		authUseCaseSpy.accessToken = { error: "email or password incorrect" };
 		const httpRequest = {
 			body: {
 				email: "wrong_email@mail.com",
@@ -105,7 +105,9 @@ describe("AuthUserRouter", () => {
 
 	it("Should return 401 if the user is not verified", async () => {
 		const { sut, authUseCaseSpy } = makeSut();
-		authUseCaseSpy.accessToken = { error: "You must verify your email, please confirm the code." };
+		authUseCaseSpy.accessToken = {
+			error: "You must verify your email, please confirm the code.",
+		};
 		const httpRequest = {
 			body: {
 				email: "valid_email@mail.com",
