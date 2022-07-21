@@ -103,6 +103,20 @@ describe("AuthUserRouter", () => {
 		expect(httpResponse.statusCode).toBe(401);
 	});
 
+	it("Should return 401 if the user is not verified", async () => {
+		const { sut, authUseCaseSpy } = makeSut();
+		authUseCaseSpy.accessToken = { error: "You must verify your email, please confirm the code." };
+		const httpRequest = {
+			body: {
+				email: "valid_email@mail.com",
+				password: "valid_password",
+			},
+		};
+
+		const httpResponse = await sut.handle(httpRequest);
+		expect(httpResponse.statusCode).toBe(401);
+	});
+
 	it("Should return 200 and the accessToken if the credentials are correct", async () => {
 		const { sut } = makeSut();
 		const httpRequest = {

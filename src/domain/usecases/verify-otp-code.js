@@ -37,7 +37,7 @@ module.exports = class VerifyOTPCode {
 			);
 
 		await this.insertVerifyToUser.verify({ email, verifyTo: true });
-		await this.deleteOTPRegisterByEmail.deleteMany({ email });
+		await this.deleteOTPRegisterByEmail.deleteMany(email);
 
 		return { isValidOTP };
 	}

@@ -22,6 +22,10 @@ module.exports = class LoginRouter {
 				return HttpResponse.unauthorizedError("email or password incorrect");
 			}
 
+			if (accessToken.error) {
+				return HttpResponse.unauthorizedError(accessToken.error);
+			}
+
 			return HttpResponse.success({ email, accessToken });
 		} catch (error) {
 			return HttpResponse.internalError("Oh no! An internal error occured.");
