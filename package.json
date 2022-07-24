@@ -10,9 +10,9 @@
   "scripts": {
     "start": "node ./src/main/",
     "dev": "nodemon ./src/main/",
-    "test": "jest --colors --runInBand --watch --onlyChanged",
-    "test:unit": "npm test -- --watch -c jest-unit-config.js",
-    "test:inte": "npm test -- --watch -c jest-integration-config.js"
+    "test": "jest --watch -c jest-unit-config.js",
+    "test:all": "jest --colors --runInBand --watch --onlyChanged",
+    "test:inte": "jest --watch -c jest-integration-config.js"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
