@@ -16,26 +16,6 @@ const makeLoadUserByEmailRepository = () => {
 	return loadUserByEmailRepositorySpy;
 };
 
-const makeLoadOTPRegisterByEmail = () => {
-	class LoadOTPRegisterByEmailSpy {
-		async load() {
-			return this.OTPRegister;
-		}
-	}
-
-	const loadOTPRegisterByEmailSpy = new LoadOTPRegisterByEmailSpy();
-	loadOTPRegisterByEmailSpy.OTPRegister = [
-		{
-			email: "any_email@mail.com",
-			otp: "hashedOTP",
-			createdAt: Date.now(),
-			expiresIn: Date.now() + 3600000,
-			length: 1,
-		},
-	];
-	return loadOTPRegisterByEmailSpy;
-};
-
 const makeTokenGenerator = () => {
 	class TokenGenerator {
 		async generate(userId) {
@@ -65,20 +45,17 @@ const makeEncrypter = () => {
 
 const makeSut = () => {
 	const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository();
-	const loadOTPRegisterByEmailSpy = makeLoadOTPRegisterByEmail();
 	const tokenGeneratorSpy = makeTokenGenerator();
 	const encrypterSpy = makeEncrypter();
 
 	const sut = new AuthUseCase({
 		loadUserByEmailRepository: loadUserByEmailRepositorySpy,
-		loadOTPRegisterByEmail: loadOTPRegisterByEmailSpy,
 		tokenGenerator: tokenGeneratorSpy,
 		encrypter: encrypterSpy,
 	});
 	return {
 		sut,
 		loadUserByEmailRepositorySpy,
-		loadOTPRegisterByEmailSpy,
 		tokenGeneratorSpy,
 		encrypterSpy,
 	};
@@ -97,12 +74,6 @@ describe("AuthUseCase", () => {
 		expect(promise).rejects.toThrow("Missing param password");
 	});
 
-	it("Should call AuthUseCase with the correct credentials", async () => {
-		const { sut, loadUserByEmailRepositorySpy } = makeSut();
-		await sut.auth("any_email@mail.com", "any_password");
-		expect(loadUserByEmailRepositorySpy.email).toBe("any_email@mail.com");
-	});
-
 	it("Should call AuthUseCase with the wrong credentials", async () => {
 		const { sut, loadUserByEmailRepositorySpy } = makeSut();
 		loadUserByEmailRepositorySpy.user = null;
@@ -110,6 +81,12 @@ describe("AuthUseCase", () => {
 			"invalid_email@mail.com",
 			"invalid_password"
 		);
-		expect(accessToken.error).toBe("email or password incorrect");
+		expect(accessToken).toBeNull();
+	});
+
+	it("Should call AuthUseCase with the correct credentials", async () => {
+		const { sut, loadUserByEmailRepositorySpy } = makeSut();
+		await sut.auth("any_email@mail.com", "any_password");
+		expect(loadUserByEmailRepositorySpy.email).toBe("any_email@mail.com");
 	});
 });

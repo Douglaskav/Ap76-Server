@@ -1,8 +1,9 @@
 const HttpResponse = require("../../utils/http-response");
 
 module.exports = class LoginRouter {
-	constructor({ emailValidator, authUseCase } = {}) {
+	constructor({ emailValidator, loadOTPRegisterByEmail, authUseCase } = {}) {
 		this.emailValidator = emailValidator;
+		this.loadOTPRegisterByEmail = loadOTPRegisterByEmail;
 		this.authUseCase = authUseCase;
 	}
 
@@ -17,9 +18,14 @@ module.exports = class LoginRouter {
 				return HttpResponse.badRequest("This is not a valid email");
 			}
 
+			const otpRegister = await this.loadOTPRegisterByEmail.load(email);
+			if (otpRegister) {
+				return HttpResponse.unauthorizedError("You must verify your email.");
+			}
+
 			const accessToken = await this.authUseCase.auth(email, password);
-			if (accessToken.error) {
-				return HttpResponse.unauthorizedError(accessToken.error);
+			if (!accessToken) {
+				return HttpResponse.unauthorizedError("Email or password wrong");
 			}
 
 			return HttpResponse.success({ email, accessToken });
