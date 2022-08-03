@@ -24,10 +24,7 @@ describe("#Routes suite case", () => {
   it("Should return a badRequest error if is missing params", async () => {
     await request(app)
       .post("/user/verify")
-      .send({
-        email: "",
-        otp: "999999",
-      })
+      .send({ email: "", otp: "999999" })
       .expect(400);
   });
 

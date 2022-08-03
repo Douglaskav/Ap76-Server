@@ -13,6 +13,18 @@ const makeEmailValidator = () => {
 	return emailValidatorSpy;
 };
 
+const makeLoadOTPRegisterByEmail = () => {
+	class LoadOTPRegisterByEmailSpy {
+		async load() {
+			return this.OTPRegister;
+		}
+	}
+
+	const loadOTPRegisterByEmailSpy = new LoadOTPRegisterByEmailSpy();
+	loadOTPRegisterByEmailSpy.OTPRegister = null;
+	return loadOTPRegisterByEmailSpy;
+};
+
 const makeAuthUseCase = () => {
 	class AuthUseCaseSpy {
 		async auth(email, password) {
@@ -30,14 +42,16 @@ const makeAuthUseCase = () => {
 
 const makeSut = () => {
 	const emailValidatorSpy = makeEmailValidator();
+	const loadOTPRegisterByEmailSpy = makeLoadOTPRegisterByEmail();
 	const authUseCaseSpy = makeAuthUseCase();
 
 	const sut = new AuthUserRouter({
 		emailValidator: emailValidatorSpy,
+		loadOTPRegisterByEmail: loadOTPRegisterByEmailSpy,
 		authUseCase: authUseCaseSpy,
 	});
 
-	return { sut, emailValidatorSpy, authUseCaseSpy };
+	return { sut, emailValidatorSpy, loadOTPRegisterByEmailSpy, authUseCaseSpy };
 };
 
 describe("AuthUserRouter", () => {
@@ -89,29 +103,26 @@ describe("AuthUserRouter", () => {
 		expect(authUseCaseSpy.email).toBe(httpRequest.body.email);
 	});
 
-	it("Should return 401 if the email or password provided are incorrect", async () => {
-		const { sut, authUseCaseSpy } = makeSut();
-		authUseCaseSpy.accessToken = { error: "email or password incorrect" };
-		const httpRequest = {
-			body: {
-				email: "wrong_email@mail.com",
-				password: "wrong_password",
-			},
-		};
+	it("Should return 401 if the user not checked your otpCode", async () => {
+		const { sut, loadOTPRegisterByEmailSpy } = makeSut();
+		loadOTPRegisterByEmailSpy.OTPRegister = [
+			{ email: "any_email@mail.com", otp: "hashedOTP" },
+		];
 
+		const httpRequest = {
+			body: { email: "any_email@mail.com", password: "any_password" },
+		};
 		const httpResponse = await sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(401);
 	});
 
-	it("Should return 401 if the user is not verified", async () => {
+	it("Should return 401 if the email or password provided are incorrect", async () => {
 		const { sut, authUseCaseSpy } = makeSut();
-		authUseCaseSpy.accessToken = {
-			error: "You must verify your email, please confirm the code.",
-		};
+		authUseCaseSpy.accessToken = null;
 		const httpRequest = {
 			body: {
-				email: "valid_email@mail.com",
-				password: "valid_password",
+				email: "wrong_email@mail.com",
+				password: "wrong_password",
 			},
 		};
 

@@ -1,14 +1,8 @@
 const HttpResponse = require("../../utils/http-response");
 
 module.exports = class AuthUseCase {
-	constructor({
-		loadUserByEmailRepository,
-		loadOTPRegisterByEmail,
-		tokenGenerator,
-		encrypter,
-	} = {}) {
+	constructor({ loadUserByEmailRepository, tokenGenerator, encrypter } = {}) {
 		this.loadUserByEmailRepository = loadUserByEmailRepository;
-		this.loadOTPRegisterByEmail = loadOTPRegisterByEmail;
 		this.tokenGenerator = tokenGenerator;
 		this.encrypter = encrypter;
 	}
@@ -18,20 +12,13 @@ module.exports = class AuthUseCase {
 		if (!password) throw new Error("Missing param password");
 
 		const user = await this.loadUserByEmailRepository.load(email);
-		const isValid =
-			user && (await this.encrypter.compare(password, user.password));
+		const isValid = user && (await this.encrypter.compare(password, user.password));
 
 		if (isValid) {
-			const hasOTPRegister = await this.loadOTPRegisterByEmail.load(user.email);
-
-			if (user.verified && !hasOTPRegister) {
-				const accessToken = await this.tokenGenerator.generate(user._id);
-				return accessToken;
-			}
-
-			return { error: "You must verify your email, please confirm the code." };
+			const accessToken = await this.tokenGenerator.generate(user._id);
+			return accessToken;
 		}
 
-		return { error: "email or password incorrect" };
+		return null;
 	}
 };

@@ -59,6 +59,25 @@ describe("#Routes suite case", () => {
       .expect(400);
   });
 
+  it("Should return an unauthorizedError if the user not verify the email", async () => {
+    await userModel.insertOne(mockUser);
+    await otpModel.insertOne({
+      _id: "any_id",
+      email: "any_valid_email@mail.com",
+      otp: "999999",
+      createdAt: Date.now(),
+      expiresIn: Date.now() + 3600000,
+    });
+
+    await request(app)
+      .post("/user/login")
+      .send({
+        email: "any_valid_email@mail.com",
+        password: "any_password_to_hash",
+      })
+      .expect(401);
+  });
+
   it("Should return an unauthorizedError if wrong credentials are provided", async () => {
     await userModel.insertOne(mockUser);
 
