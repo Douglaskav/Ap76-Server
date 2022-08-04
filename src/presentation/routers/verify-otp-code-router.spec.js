@@ -3,9 +3,7 @@ const VerifyOTPCodeRouter = require("./verify-otp-code-router");
 const makeVerifyOTPCode = () => {
 	class VerifyOTPCodeSpy {
 		async verify() {
-			return {
-				isValidOTP: this.isValidOTP,
-			};
+			return this.isValidOTP;
 		}
 	}
 
@@ -28,9 +26,9 @@ describe("VerifyOTPCodeRouter", () => {
 		expect(httpResponse.statusCode).toBe(500);
 	});
 
-	it("Should throw if not was possible check the code", async () => {
+	it("Should return an unauthorizedError if not was possible check the code", async () => {
 		const { sut, verifyOTPCodeSpy } = makeSut();
-		verifyOTPCodeSpy.isValidOTP = false;
+		verifyOTPCodeSpy.isValidOTP = null;
 
 		const httpRequest = {
 			body: { email: "any_email@mail.com", otp: "any_otp" },

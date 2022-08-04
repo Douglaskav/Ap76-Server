@@ -94,33 +94,30 @@ describe("VerifyOTPCode", () => {
 		}
 	});
 
-	it("Should throw if loadOTPRegisterByEmailSpy don't found any register", async () => {
+	it("Should return null if loadOTPRegisterByEmailSpy don't found any register", async () => {
 		const { sut, loadOTPRegisterByEmailSpy } = makeSut();
 		loadOTPRegisterByEmailSpy.OTPRegister = { length: 0 };
-		const promise = sut.verify(defaultMockValues);
-		expect(promise).rejects.toThrow(
-			"Not was found an OTPRegistry for this user."
-		);
+		const httpResponse = await sut.verify(defaultMockValues);
+		expect(httpResponse).toBeNull();
 	});
 
 	it("Should return an unauthorizedError if the OTPCode was been expired", async () => {
 		const { sut, loadOTPRegisterByEmailSpy } = makeSut();
 		loadOTPRegisterByEmailSpy.OTPRegister.expiresIn = Date.now() - 3600000;
-		const codeIsValid = await sut.verify(defaultMockValues);
-		expect(codeIsValid.statusCode).toBe(401);
-		expect(codeIsValid.body.error).toBe("Code has expired. Please request another");
+		const httpResponse = await sut.verify(defaultMockValues);
+		expect(httpResponse).toBeNull();
 	});
 
-	it("Should return an unauthorizedError if the OTPCode is invalid", async () => {
+	it("Should return an unauthorizedError if the OTPCode is wrong", async () => {
 		const { sut, encrypterSpy } = makeSut();
 		encrypterSpy.isValid = false;
-		const isValid = await sut.verify(defaultMockValues);
-		expect(isValid.statusCode).toBe(401);
+		const isValidOTP = await sut.verify(defaultMockValues);
+		expect(isValidOTP).toBeNull();
 	});
 
 	it("Should return the isValidOTP boolean if the code provided is valid", async () => {
 		const { sut } = makeSut();
-		const codeIsValid = await sut.verify(defaultMockValues);
-		expect(codeIsValid).toHaveProperty("isValidOTP");
+		const httpResponse = await sut.verify(defaultMockValues);
+		expect(httpResponse).toBeTruthy();
 	});
 });
