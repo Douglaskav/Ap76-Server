@@ -18,8 +18,8 @@ module.exports = class LoginRouter {
 				return HttpResponse.badRequest("This is not a valid email");
 			}
 
-			const otpRegister = await this.loadOTPRegisterByEmail.load(email);
-			if (otpRegister) {
+			const emailIsNotVerified = await this.loadOTPRegisterByEmail.load(email);
+			if (emailIsNotVerified) {
 				return HttpResponse.unauthorizedError("You must verify your email.");
 			}
 

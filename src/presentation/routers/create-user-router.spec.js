@@ -26,6 +26,18 @@ const makeCreateUserUseCase = () => {
 	return createUserUseCase;
 };
 
+const makeLoadUserByEmailRepository = () => {
+	class LoadUserByEmailRepositorySpy {
+		async load(email) {
+			this.email = email;
+			if (this.user && this.email === this.user.email) return this.user;
+		}
+	}
+
+	const loadUserByEmailRepositorySpy = new LoadUserByEmailRepositorySpy();
+	return loadUserByEmailRepositorySpy;
+};
+
 const makeSendOTPEmailVerification = () => {
 	class SendOTPEmailVerificationSpy {
 		async sendEmailVerification({ _id, email }) {
@@ -48,11 +60,13 @@ const makeSendOTPEmailVerification = () => {
 const makeSut = () => {
 	const emailValidatorSpy = makeEmailValidator();
 	const createUserUseCaseSpy = makeCreateUserUseCase();
+		const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository();
 	const sendOTPEmailVerificationSpy = makeSendOTPEmailVerification();
 
 	const sut = new CreateUserRouter({
 		emailValidator: emailValidatorSpy,
 		createUserUseCase: createUserUseCaseSpy,
+		loadUserByEmailRepository: loadUserByEmailRepositorySpy,
 		sendOTPEmailVerification: sendOTPEmailVerificationSpy,
 	});
 
@@ -60,6 +74,7 @@ const makeSut = () => {
 		sut,
 		emailValidatorSpy,
 		createUserUseCaseSpy,
+		loadUserByEmailRepositorySpy,
 		sendOTPEmailVerificationSpy,
 	};
 };
@@ -109,6 +124,14 @@ describe("CreateUserRouter", () => {
 		const httpRequest = {};
 		const httpResponse = await sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(500);
+	});
+
+		it("Should return an 409 error if an user already exists", async () => {
+		const { sut, loadUserByEmailRepositorySpy } = makeSut();
+		loadUserByEmailRepositorySpy.user = { email: "valid_email@mail.com" };
+		const httpResponse = await sut.handle(defaultMockHttpRequest);
+		expect(httpResponse.statusCode).toBe(409);
+		expect(httpResponse.body.error).toBe("Already exists an user with this email.");
 	});
 
 	it("Should throw if not was possible to create a new user", async () => {

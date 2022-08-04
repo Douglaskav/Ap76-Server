@@ -13,11 +13,9 @@ module.exports = class CreateUserRouterComposer {
   static compose() {
     const emailValidator = new EmailValidator();
 
-    const loadUserByEmailRepository = new LoadUserByEmailRepository();
     const insertUserRepository = new InsertUserRepository();
     const encrypter = new Encrypter();
     const createUserUseCase = new CreateUserUseCase({
-      loadUserByEmailRepository,
       insertUserRepository,
       encrypter,
     });
@@ -29,12 +27,14 @@ module.exports = class CreateUserRouterComposer {
       encrypter,
       insertOTPRegister,
       deleteOTPRegister,
-      emailManager
+      emailManager,
     });
+    const loadUserByEmailRepository = new LoadUserByEmailRepository();
 
     const createUserRouter = new CreateUserRouter({
       emailValidator,
       createUserUseCase,
+      loadUserByEmailRepository,
       sendOTPEmailVerification,
     });
     return createUserRouter;
