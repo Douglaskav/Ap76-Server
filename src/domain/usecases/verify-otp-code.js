@@ -16,7 +16,7 @@ module.exports = class VerifyOTPCode {
 			throw new Error("email and OTP_code should be provided");
 
 		const otpVerificationCode = await this.loadOTPRegisterByEmail.load(email);
-		if (otpVerificationCode.length <= 0) return null;
+		if (!otpVerificationCode) return null;
 
 		const { expiresIn, otp: hashedOTP } = otpVerificationCode;
 
