@@ -25,9 +25,13 @@ module.exports = class LoginRouter {
 				return HttpResponse.badRequest("Missing param");
 			}
 
-			const alreadyExistsAnUserWithThisEmail = await this.loadUserByEmailRepository.load(email);
+			const alreadyExistsAnUserWithThisEmail =
+				await this.loadUserByEmailRepository.load(email);
 
-		if (alreadyExistsAnUserWithThisEmail) return HttpResponse.conflictError("Already exists an user with this email.");
+			if (alreadyExistsAnUserWithThisEmail)
+				return HttpResponse.conflictError(
+					"Already exists an user with this email."
+				);
 
 			const { insertedId: userId } = await this.createUserUseCase.create({
 				email,

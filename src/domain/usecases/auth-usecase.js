@@ -1,5 +1,3 @@
-const HttpResponse = require("../../utils/http-response");
-
 module.exports = class AuthUseCase {
 	constructor({ loadUserByEmailRepository, tokenGenerator, encrypter } = {}) {
 		this.loadUserByEmailRepository = loadUserByEmailRepository;
