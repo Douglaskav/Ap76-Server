@@ -42,11 +42,10 @@ const makeSut = () => {
 
 describe("CreateUser UseCase", () => {
 	let defaultMockUser = {
-			email: "any_email@mail.com",
-			username: "any_username",
-			password: "any_password",
-		};
-
+		email: "any_email@mail.com",
+		username: "any_username",
+		password: "any_password",
+	};
 
 	it("Should throw if CreateUserUseCase is called missing params", () => {
 		const { sut } = makeSut();

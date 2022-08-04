@@ -74,25 +74,24 @@ const makeSut = () => {
 };
 
 describe("SendOTPEmailVerification", () => {
-	it("Should return an error 400 if the params are not provided correctly", async () => {
+	it("Should throw if the email is not provided correctly", () => {
 		const { sut } = makeSut();
-		const httpResponse = await sut.sendEmailVerification("");
-		expect(httpResponse.body.error).toBe("Missing params");
-		expect(httpResponse.statusCode).toBe(400);
+		const promise = sut.sendEmailVerification("");
+		expect(promise).rejects.toThrow("Missing email param");
 	});
 
-	it("Should return an error 500 if was't possible encrypt the OTP Code", async () => {
+	it("Should return an error 500 if was't possible encrypt the OTP Code", () => {
 		const { sut, encrypterSpy } = makeSut();
 		encrypterSpy.hash = null;
-		const httpResponse = await sut.sendEmailVerification("valid_email@mail.com");
-		expect(httpResponse.statusCode).toBe(500);
+		const promise = sut.sendEmailVerification("valid_email@mail.com");
+		expect(promise).rejects.toThrow("Error while trying encrypt OTP Code");
 	});
 
 	it("Should return 500 if not was possible to send the email", async () => {
 		const { sut, emailManagerSpy } = makeSut();
 		emailManagerSpy.messageId = null;
 		const httpResponse = await sut.sendEmailVerification("valid_email@mail.com");
-		expect(httpResponse.statusCode).toBe(500);
+		expect(httpResponse).toBeNull();
 	});
 
 	it("Should return the emailSent and otp code if occured everything ok", async () => {

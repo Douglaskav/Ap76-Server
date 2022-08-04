@@ -44,9 +44,9 @@ const makeSendOTPEmailVerification = () => {
 			if (!this.messageId) return null;
 
 			return {
-					email: "accepted",
-					messageId: this.messageId,
-					rejected: [],
+				email: "accepted",
+				messageId: this.messageId,
+				rejected: [],
 			};
 		}
 	}
@@ -60,7 +60,7 @@ const makeSendOTPEmailVerification = () => {
 const makeSut = () => {
 	const emailValidatorSpy = makeEmailValidator();
 	const createUserUseCaseSpy = makeCreateUserUseCase();
-		const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository();
+	const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository();
 	const sendOTPEmailVerificationSpy = makeSendOTPEmailVerification();
 
 	const sut = new CreateUserRouter({
@@ -126,12 +126,14 @@ describe("CreateUserRouter", () => {
 		expect(httpResponse.statusCode).toBe(500);
 	});
 
-		it("Should return an 409 error if an user already exists", async () => {
+	it("Should return an 409 error if an user already exists", async () => {
 		const { sut, loadUserByEmailRepositorySpy } = makeSut();
 		loadUserByEmailRepositorySpy.user = { email: "valid_email@mail.com" };
 		const httpResponse = await sut.handle(defaultMockHttpRequest);
 		expect(httpResponse.statusCode).toBe(409);
-		expect(httpResponse.body.error).toBe("Already exists an user with this email.");
+		expect(httpResponse.body.error).toBe(
+			"Already exists an user with this email."
+		);
 	});
 
 	it("Should throw if not was possible to create a new user", async () => {

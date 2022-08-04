@@ -11,8 +11,10 @@ module.exports = class VerifyOTPCodeRouter {
 			if (!email || !otp) return HttpResponse.badRequest("Missing params");
 
 			const verifiedUser = await this.verifyOTPCode.verify({ email, otp });
-			if (!verifiedUser.isValidOTP)
-				return HttpResponse.unauthorizedError("Not was possible verify the user!");
+			if (!verifiedUser)
+				return HttpResponse.unauthorizedError(
+					"Not was possible verify the user!"
+				);
 
 			return HttpResponse.success({ email, verifiedUser });
 		} catch (error) {

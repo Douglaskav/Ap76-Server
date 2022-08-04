@@ -1,5 +1,3 @@
-const HttpResponse = require("../../utils/http-response");
-
 module.exports = class CreateUserUseCase {
 	constructor({ insertUserRepository, encrypter } = {}) {
 		this.insertUserRepository = insertUserRepository;
