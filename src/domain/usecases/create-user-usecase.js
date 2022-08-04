@@ -1,12 +1,7 @@
 const HttpResponse = require("../../utils/http-response");
 
 module.exports = class CreateUserUseCase {
-	constructor({
-		loadUserByEmailRepository,
-		insertUserRepository,
-		encrypter,
-	} = {}) {
-		this.loadUserByEmailRepository = loadUserByEmailRepository;
+	constructor({ insertUserRepository, encrypter } = {}) {
 		this.insertUserRepository = insertUserRepository;
 		this.encrypter = encrypter;
 	}
@@ -14,21 +9,13 @@ module.exports = class CreateUserUseCase {
 	async create({ email, username, password }) {
 		if (!email || !username || !password) throw new Error("Missing Params");
 
-		const user = await this.loadUserByEmailRepository.load(email);
-		if (user)
-			return HttpResponse.conflictError(
-				"Already existe an user with this email."
-			);
-
 		const SALT_ROUNDS = 8;
 		const hashedPassword = await this.encrypter.generateHash(
 			password,
-			SALT_ROUNDS	
+			SALT_ROUNDS
 		);
 		if (!hashedPassword)
-			return HttpResponse.internalError(
-				"Not was possible encrypted the password"
-			);
+			throw new Error("Not was possible encrypted the password");
 
 		const newUser = await this.insertUserRepository.insert({
 			email,

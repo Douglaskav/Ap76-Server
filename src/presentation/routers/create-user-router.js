@@ -4,10 +4,12 @@ module.exports = class LoginRouter {
 	constructor({
 		emailValidator,
 		createUserUseCase,
+		loadUserByEmailRepository,
 		sendOTPEmailVerification,
 	} = {}) {
 		this.emailValidator = emailValidator;
 		this.createUserUseCase = createUserUseCase;
+		this.loadUserByEmailRepository = loadUserByEmailRepository;
 		this.sendOTPEmailVerification = sendOTPEmailVerification;
 	}
 
@@ -22,6 +24,10 @@ module.exports = class LoginRouter {
 			if (!username || !email || !password) {
 				return HttpResponse.badRequest("Missing param");
 			}
+
+			const alreadyExistsAnUserWithThisEmail = await this.loadUserByEmailRepository.load(email);
+
+		if (alreadyExistsAnUserWithThisEmail) return HttpResponse.conflictError("Already exists an user with this email.");
 
 			const { insertedId: userId } = await this.createUserUseCase.create({
 				email,
