@@ -14,7 +14,6 @@ const makeLoadOTPRegisterByEmail = () => {
 			otp: "hashedOTP",
 			createdAt: Date.now(),
 			expiresIn: Date.now() + 3600000,
-			length: 1,
 		},
 	];
 	return loadOTPRegisterByEmailSpy;
@@ -96,7 +95,7 @@ describe("VerifyOTPCode", () => {
 
 	it("Should return null if loadOTPRegisterByEmailSpy don't found any register", async () => {
 		const { sut, loadOTPRegisterByEmailSpy } = makeSut();
-		loadOTPRegisterByEmailSpy.OTPRegister = { length: 0 };
+		loadOTPRegisterByEmailSpy.OTPRegister = null;
 		const httpResponse = await sut.verify(defaultMockValues);
 		expect(httpResponse).toBeNull();
 	});
